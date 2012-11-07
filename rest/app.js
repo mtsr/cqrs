@@ -5,11 +5,8 @@ var amqp = require('amqp');
 
 var app = express();
 
-var cid = 0;
-var qid = 0;
-
-var commandReplyQueue = [];
-var queryReplyQueue = [];
+var requestId = 0;
+var replyQueue = [];
 
 app.configure(function() {
     app.set('port', process.env.PORT || 3000);
@@ -32,17 +29,21 @@ connection.on('ready', function() {
     console.log('Exchange:', exchange);
 
     app.post('*', function(req, res) {
-        commandReplyQueue[cid] = res;
-        exchange.publish('command', { command: req.url, cid: cid++ }, { replyTo: 'rest' }, function() {
+        console.log('POST');
+        replyQueue[requestId] = res;
+        exchange.publish('command', { command: req.url }, { replyTo: 'rest', correlationId: requestId.toString() }, function() {
             console.log('Publish callback:', arguments);
         });
+        requestId++;
     });
 
     app.get('*', function(req, res) {
-        queryReplyQueue[qid] = res;
-        exchange.publish('command', { query: req.url, qid: qid++ }, { replyTo: 'rest' }, function() {
+        console.log('GET');
+        replyQueue[requestId] = res;
+        exchange.publish('command', { query: req.url }, { replyTo: 'rest', correlationId: requestId.toString() }, function() {
             console.log('Publish callback:', arguments);
         });
+        requestId++;
     });
 
     app.put('*', function(req, res) {
@@ -54,15 +55,13 @@ connection.on('ready', function() {
     connection.queue('rest', function(queue) {
         queue.bind('rest', 'rest');
         console.log('Queue is open:', arguments);
-        
+
         queue.subscribe(function(message, headers, deliveryInfo) {
             console.log('Message from queue:', arguments);
-            if (message.cid !== undefined && message.cid !== null) {
-                commandReplyQueue[message.cid].send(message);
-            } else if (message.qid !== undefined && message.qid !== null) {
-                queryReplyQueue[message.qid].send(message);
+            if (replyQueue[deliveryInfo.correlationId]) {
+                replyQueue[deliveryInfo.correlationId].send(message);
             } else {
-                throw "Unknown message type";
+                console.log('ERROR: CorrelationId', deliveryInfo.correlationId, 'not in reply queue');
             }
         });
     });

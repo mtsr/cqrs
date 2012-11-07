@@ -14,7 +14,9 @@ connection.on('ready', function() {
 
         queue.subscribe(function(message, headers, deliveryInfo) {
             console.log('Message from queue:', arguments);
-            exchange.publish(deliveryInfo.replyTo, { response: message, cid: message.cid });
+            exchange.publish(deliveryInfo.replyTo, { response: message }, { correlationId: deliveryInfo.correlationId }, function() {
+                console.log('Publish callback:', arguments);
+            });
         });
     });
 
