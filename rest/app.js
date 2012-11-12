@@ -24,9 +24,9 @@ app.configure(function() {
 var connection = amqp.createConnection();
 connection.on('ready', function() {
     var exchange = connection.exchange('command', { type: 'direct' }, function(exchange) {
-        console.log('Exchange is open:', arguments);
+        // console.log('Exchange is open:', arguments);
     });
-    console.log('Exchange:', exchange);
+    // console.log('Exchange:', exchange);
 
     app.post('*', function(req, res) {
         console.log('POST');
@@ -38,12 +38,6 @@ connection.on('ready', function() {
     });
 
     app.get('*', function(req, res) {
-        console.log('GET');
-        replyQueue[requestId] = res;
-        exchange.publish('command', { query: req.url }, { replyTo: 'rest', correlationId: requestId.toString() }, function() {
-            console.log('Publish callback:', arguments);
-        });
-        requestId++;
     });
 
     app.put('*', function(req, res) {
@@ -54,7 +48,7 @@ connection.on('ready', function() {
 
     connection.queue('rest', function(queue) {
         queue.bind('rest', 'rest');
-        console.log('Queue is open:', arguments);
+        // console.log('Queue is open:', arguments);
 
         queue.subscribe(function(message, headers, deliveryInfo) {
             console.log('Message from queue:', arguments);
