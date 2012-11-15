@@ -3,6 +3,8 @@ var http = require('http');
 
 var amqp = require('amqp');
 
+var _ = require('underscore');
+
 var app = express();
 
 var requestId = 0;
@@ -30,15 +32,25 @@ connection.on('ready', function() {
 
     app.post('/:aggregate/:aggregateID/:command', function(req, res) {
         console.log('POST', req);
-        // console.log('POST', req.url, req.body, req);
+
         replyQueue[requestId] = res;
-        exchange.publish('command', { 
-            aggregate: req.params.aggregate,
-            aggregateID: req.params.aggregateID,
-            command: req.params.command,
+
+        var commandData = {
+            // because req.params is an [] not an {} properties are lost upon JSONify
+            // solved by copying the properties to an {}
+            params: _.extend({}, req.params),
+            query: req.query,
             data: req.body,
-            query: req.query
-        }, { replyTo: 'rest', correlationId: requestId.toString() }, function() {
+            headers: req.headers
+        };
+        console.log(commandData, JSON.stringify(commandData));
+
+        var messageData = {
+            replyTo: 'rest',
+            correlationId: requestId.toString()
+        };
+
+        exchange.publish('command', commandData, messageData, function() {
             console.log('Publish callback:', arguments);
         });
         requestId++;
