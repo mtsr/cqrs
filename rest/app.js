@@ -28,10 +28,17 @@ connection.on('ready', function() {
     });
     // console.log('Exchange:', exchange);
 
-    app.post('*', function(req, res) {
-        console.log('POST', req.url, req.body, req);
+    app.post('/:aggregate/:aggregateID/:command', function(req, res) {
+        console.log('POST', req);
+        // console.log('POST', req.url, req.body, req);
         replyQueue[requestId] = res;
-        exchange.publish('command', { command: req.url, data: req.body }, { replyTo: 'rest', correlationId: requestId.toString() }, function() {
+        exchange.publish('command', { 
+            aggregate: req.params.aggregate,
+            aggregateID: req.params.aggregateID,
+            command: req.params.command,
+            data: req.body,
+            query: req.query
+        }, { replyTo: 'rest', correlationId: requestId.toString() }, function() {
             console.log('Publish callback:', arguments);
         });
         requestId++;
