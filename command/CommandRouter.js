@@ -2,13 +2,8 @@ var CommandRouter = function() {
 
 };
 
-CommandRouter.prototype.route = function(req, res) {
-    var commandName = req.url;
-    var Command = require('./Commands'+commandName);
-    var command = new Command();
-
-    command.run();
-    res.send('CommandRouter');
+CommandRouter.prototype.handle = function(aggregate, aggregateID, command) {
+    return { aggregate: aggregate, aggregateID: aggregateID, command: command };
 }
 
 module.exports = new CommandRouter();
