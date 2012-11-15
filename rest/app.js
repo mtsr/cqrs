@@ -29,9 +29,9 @@ connection.on('ready', function() {
     // console.log('Exchange:', exchange);
 
     app.post('*', function(req, res) {
-        console.log('POST');
+        console.log('POST', req.url, req.body, req);
         replyQueue[requestId] = res;
-        exchange.publish('command', { command: req.url }, { replyTo: 'rest', correlationId: requestId.toString() }, function() {
+        exchange.publish('command', { command: req.url, data: req.body }, { replyTo: 'rest', correlationId: requestId.toString() }, function() {
             console.log('Publish callback:', arguments);
         });
         requestId++;

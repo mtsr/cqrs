@@ -1,2 +1,0 @@
-var query = require('./QueryRouter');
-
