@@ -1,14 +1,11 @@
 var express = require('express');
 var http = require('http');
 
-var amqp = require('amqp');
-
 var _ = require('underscore');
 
-var app = express();
+var commandHandler = require('./CommandHandler');
 
-var requestId = 0;
-var replyQueue = [];
+var app = express();
 
 app.configure(function() {
     app.set('port', process.env.PORT || 3000);
@@ -23,17 +20,9 @@ app.configure(function() {
     app.use(app.router);
 });
 
-var connection = amqp.createConnection();
-connection.on('ready', function() {
-    var exchange = connection.exchange('command', { type: 'direct' }, function(exchange) {
-        // console.log('Exchange is open:', arguments);
-    });
-    // console.log('Exchange:', exchange);
-
+commandHandler.init(function() {
     app.post('/:aggregate/:aggregateID/:command', function(req, res) {
         console.log('POST', req);
-
-        replyQueue[requestId] = res;
 
         var commandData = {
             // because req.params is an [] not an {} properties are lost upon JSONify
@@ -41,19 +30,13 @@ connection.on('ready', function() {
             params: _.extend({}, req.params),
             query: req.query,
             data: req.body,
-            headers: req.headers
-        };
-        console.log(commandData, JSON.stringify(commandData));
-
-        var messageData = {
-            replyTo: 'rest',
-            correlationId: requestId.toString()
+            // headers: req.headers
         };
 
-        exchange.publish('command', commandData, messageData, function() {
-            console.log('Publish callback:', arguments);
+        commandHandler.handle(commandData, function(response) {
+            console.log('CommandHandler Result');
+            res.send(response);
         });
-        requestId++;
     });
 
     app.get('*', function(req, res) {
@@ -65,27 +48,7 @@ connection.on('ready', function() {
     app.delete('*', function(req, res) {
     });
 
-    connection.queue('rest', function(queue) {
-        queue.bind('rest', 'rest');
-        // console.log('Queue is open:', arguments);
-
-        queue.subscribe(function(message, headers, deliveryInfo) {
-            console.log('Message from queue:', arguments);
-            if (replyQueue[deliveryInfo.correlationId]) {
-                replyQueue[deliveryInfo.correlationId].send(message);
-            } else {
-                console.log('ERROR: CorrelationId', deliveryInfo.correlationId, 'not in reply queue');
-            }
-        });
-    });
-
-    process.on('SIGINT', function() {
-        exchange.destroy();
-        connection.end();
-    });
-
     http.createServer(app).listen(app.get('port'), function() {
             console.log('Express server listening on port', app.get('port'));
     });
 });
-
