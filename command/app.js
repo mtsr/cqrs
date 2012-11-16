@@ -1,21 +1,41 @@
 var amqp = require('amqp');
 
-var commandHandler = require('./CommandHandler');
+var EventStore = require('eventstore');
+var EventStorage = require('eventstore.mongoDb');
 
-var exchange = null;
+var CommandHandler = require('./CommandHandler');
+var Publisher = require('./Publisher');
 
 var connection = amqp.createConnection();
 connection.on('ready', function() {
-    exchange = connection.exchange('rest', { type: 'direct' }, function(exchange) {
+    var exchange = connection.exchange('rest', { type: 'direct' }, function(exchange) {
         // console.log('Exchange is open:', arguments);
     });
+
+    var publisher = new Publisher(exchange);
+    var eventStore = EventStore.createStore();
+    EventStorage.createStorage(function(err, eventStorage) {
+        if (err) {
+            throw err;
+        }
+        console.log('EventStorage created');
+        eventStore.configure(function() {
+            eventStore.use(eventStorage);
+            eventStore.use(publisher); // your publisher must provide function 'publisher.publish(event)'
+            eventStore.use({ logger: 'console' });
+        });
+
+        // start EventStore
+        eventStore.start();
+    });
+    var commandHandler = new CommandHandler(eventStore);
 
     connection.queue('command', function(queue) {
         queue.bind('command', 'command');
         // console.log('Queue is open:', arguments);
 
         queue.subscribe(function(message, headers, deliveryInfo) {
-            receiveMessage(message, headers, deliveryInfo);
+            receiveMessage(exchange, commandHandler, message, headers, deliveryInfo);
         });
     });
 
@@ -25,7 +45,7 @@ connection.on('ready', function() {
     });
 });
 
-var receiveMessage = function(message, headers, deliveryInfo) {
+var receiveMessage = function(exchange, commandHandler, message, headers, deliveryInfo) {
     console.log('Message from queue:', arguments);
 
     commandHandler.handle(
@@ -33,11 +53,11 @@ var receiveMessage = function(message, headers, deliveryInfo) {
         message.params.aggregateID,
         message.params.command,
         message.body,
-        function(err, response) { sendResponse(err, response, deliveryInfo); }
+        function(err, response) { sendResponse(exchange, err, response, deliveryInfo); }
     );
 }
 
-var sendResponse = function(err, response, deliveryInfo) {
+var sendResponse = function(exchange, err, response, deliveryInfo) {
     console.log('RESPONSE', response);
 
     var responseData = { response: response };
