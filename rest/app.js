@@ -20,9 +20,9 @@ app.configure(function() {
     app.use(app.router);
 });
 
-commandHandler.init(function() {
+commandHandler.init(function(err) {
     app.post('/:aggregate/:aggregateID/:command', function(req, res) {
-        console.log('POST', req);
+        console.log('POST', req.url);
 
         var commandData = {
             // because req.params is an [] not an {} properties are lost upon JSONify
@@ -33,7 +33,7 @@ commandHandler.init(function() {
             // headers: req.headers
         };
 
-        commandHandler.handle(commandData, function(response) {
+        commandHandler.handle(commandData, function(err, response) {
             console.log('CommandHandler Result');
             res.send(response);
         });

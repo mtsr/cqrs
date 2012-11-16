@@ -1,10 +1,12 @@
 var amqp = require('amqp');
 
-var command = require('./CommandRouter');
+var commandHandler = require('./CommandHandler');
+
+var exchange = null;
 
 var connection = amqp.createConnection();
 connection.on('ready', function() {
-    var exchange = connection.exchange('rest', { type: 'direct' }, function(exchange) {
+    exchange = connection.exchange('rest', { type: 'direct' }, function(exchange) {
         // console.log('Exchange is open:', arguments);
     });
 
@@ -13,16 +15,7 @@ connection.on('ready', function() {
         // console.log('Queue is open:', arguments);
 
         queue.subscribe(function(message, headers, deliveryInfo) {
-            console.log('Message from queue:', arguments);
-
-            var response = command.handle(message.params.aggregate, message.params.aggregateID, message.params.command, message.body);
-            console.log('RESPONSE', response);
-
-            var responseData = { response: response };
-            var messageData = { correlationId: deliveryInfo.correlationId };
-            exchange.publish(deliveryInfo.replyTo, responseData, messageData, function() {
-                console.log('Publish callback:', arguments);
-            });
+            receiveMessage(message, headers, deliveryInfo);
         });
     });
 
@@ -31,3 +24,25 @@ connection.on('ready', function() {
         connection.end();
     });
 });
+
+var receiveMessage = function(message, headers, deliveryInfo) {
+    console.log('Message from queue:', arguments);
+
+    commandHandler.handle(
+        message.params.aggregate,
+        message.params.aggregateID,
+        message.params.command,
+        message.body,
+        function(err, response) { sendResponse(err, response, deliveryInfo); }
+    );
+}
+
+var sendResponse = function(err, response, deliveryInfo) {
+    console.log('RESPONSE', response);
+
+    var responseData = { response: response };
+    var messageData = { correlationId: deliveryInfo.correlationId };
+    exchange.publish(deliveryInfo.replyTo, responseData, messageData, function() {
+        console.log('Publish callback:', arguments);
+    });
+};
