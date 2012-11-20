@@ -14,6 +14,9 @@ var CommandHandler = Base.extend({
             function(next) {
                 self.loadAggregate(aggregate, aggregateID, next);
             },
+            function(command, aggregate, stream, next) {
+                self.commit(aggregate, stream);
+            }
         ], function(err) {
             if (err) {
                 throw err;
