@@ -9,7 +9,7 @@
     "async": "*",
     "lodash": "*",
     "amqp": "*",
-    "cqrs-domain": "*",
+    "cqrs-domain": "git://github.com/mtsr/node-cqrs-domain.git",
     "eventstore.mongoDb": "*",
     "mongodb": "*"
   }

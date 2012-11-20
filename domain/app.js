@@ -1,5 +1,7 @@
+var util = require('util');
 var amqp = require('amqp');
 var async = require('async');
+var _ = require('lodash');
 
 var domain = require('cqrs-domain').domain;
 
@@ -8,6 +10,10 @@ var Publisher = require('./Publisher');
 async.waterfall([
     function(next) {
         domain.on('event', function(event) {
+            console.log('domain event', event);
+        });
+
+        domain.on('*', function(event) {
             console.log('domain event', event);
         });
 
@@ -49,6 +55,7 @@ async.waterfall([
             }
         }, function(err) {
             console.log('domain.initialize() done')
+
             next(err, domain);
         });
     },
@@ -65,26 +72,23 @@ async.waterfall([
 
                 queue.subscribe(function(message, headers, deliveryInfo) {
                     console.log('Message:', message);
-                    try {
-                        // receiveMessage(exchange, commandHandler, message, headers, deliveryInfo);
-                        var command = {
-                            command: message.params.command,
-                        };
-                        var payload = message.body || {};
-                        payload.id = message.params.aggregateID;
-                        command.payload = payload;
+                    // receiveMessage(exchange, commandHandler, message, headers, deliveryInfo);
+                    var command = {
+                        command: message.params.command,
+                    };
+                    var payload = message.body || {};
+                    payload.id = message.params.aggregateID;
+                    command.payload = payload;
 
-                        domain.handle(command, function(err) {
-                            if (err) {
-                                throw err;
-                            }
-                            console.log('domain.handle() done');
-                            sendResponse(exchange, deliveryInfo, err, 'ACK');
-                        });
-                    } catch(err) {
-                        sendResponse(exchange, deliveryInfo, err, 'NACK');
-                        throw err;
-                    }
+                    domain.handle(command, function(err) {
+                        if (err) {
+                            sendResponse(exchange, deliveryInfo, err);
+                            // throw err;
+                            return;
+                        }
+                        console.log('domain.handle() done');
+                        sendResponse(exchange, deliveryInfo, err, 'ACK');
+                    });
                 });
             });
 
@@ -105,9 +109,13 @@ async.waterfall([
 );
 
 var sendResponse = function(exchange, deliveryInfo, err, response) {
+    if (err) {
+        console.log(err);
+    }
     console.log('RESPONSE', response);
 
-    var responseData = { response: response };
+    var responseData = { err: util.inspect(err), response: response };
+    console.log(responseData);
     var messageData = { correlationId: deliveryInfo.correlationId };
     exchange.publish(deliveryInfo.replyTo, responseData, messageData, function() {
         console.log('Publish callback:', arguments);
