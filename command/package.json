@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "async": "*",
-    "underscore": "*",
+    "lodash": "*",
     "amqp": "*"
   }
 }

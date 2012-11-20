@@ -3,7 +3,7 @@ var amqp = require('amqp');
 var EventStore = require('eventstore');
 var EventStorage = require('eventstore.mongoDb');
 
-var CommandHandler = require('./CommandHandler');
+var CommandHandler = require('./Bases/CommandHandler');
 var Publisher = require('./Publisher');
 
 var connection = amqp.createConnection();
