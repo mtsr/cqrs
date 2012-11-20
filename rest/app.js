@@ -35,6 +35,9 @@ commandHandler.init(function(err) {
 
         commandHandler.handle(commandData, function(err, response) {
             console.log('CommandHandler Result');
+            if (err) {
+                return res.send(500, err);
+            }
             res.send(response);
         });
     });
