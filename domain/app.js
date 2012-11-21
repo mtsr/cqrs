@@ -9,9 +9,9 @@ var Publisher = require('./Publisher');
 
 async.waterfall([
     function(next) {
-        domain.on('event', function(event) {
-            console.log('domain event', event);
-        });
+        // domain.on('event', function(event) {
+        //     console.log('domain event', event);
+        // });
 
         domain.on('*', function(event) {
             console.log('domain event', event);
@@ -29,7 +29,7 @@ async.waterfall([
                 type: 'mongoDb',                            // example with mongoDb
                 dbName: 'domain',
                 collectionName: 'commands',                 // optional
-                host: 'localhost',                          // optional
+                host: '127.0.0.1',                          // optional
                 port: 27017,                                // optional
                 // username: 'user',                           // optional
                 // password: 'pwd'                             // optional
@@ -38,7 +38,7 @@ async.waterfall([
                 type: 'mongoDb',                            // example with mongoDb
                 dbName: 'domain',
                 collectionName: 'sagas',                    // optional
-                host: 'localhost',                          // optional
+                host: '127.0.0.1',                          // optional
                 port: 27017,                                // optional
                 // username: 'user',                           // optional
                 // password: 'pwd'                             // optional
@@ -48,7 +48,7 @@ async.waterfall([
                 dbName: 'domain',
                 eventsCollectionName: 'events',             // optional
                 snapshotsCollectionName: 'snapshots',       // optional
-                host: 'localhost',                          // optional
+                host: '127.0.0.1',                          // optional
                 port: 27017,                                // optional
                 // username: 'user',                           // optional
                 // password: 'pwd'                             // optional
@@ -76,9 +76,10 @@ async.waterfall([
                     var command = {
                         command: message.params.command,
                     };
-                    var payload = message.body || {};
+                    var payload = message.data || {};
                     payload.id = message.params.aggregateID;
                     command.payload = payload;
+                    command.id = message.params.commandID;
 
                     domain.handle(command, function(err) {
                         if (err) {
@@ -110,12 +111,11 @@ async.waterfall([
 
 var sendResponse = function(exchange, deliveryInfo, err, response) {
     if (err) {
-        console.log(err);
+        console.log('Send response received error:', err);
     }
-    console.log('RESPONSE', response);
 
     var responseData = { err: util.inspect(err), response: response };
-    console.log(responseData);
+    console.log('RESPONSE', responseData);
     var messageData = { correlationId: deliveryInfo.correlationId };
     exchange.publish(deliveryInfo.replyTo, responseData, messageData, function() {
         console.log('Publish callback:', arguments);
