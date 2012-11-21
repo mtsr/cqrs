@@ -30,10 +30,8 @@ var Aggregate = Base.extend({
 
     toEvent: function(name, data) {
         var event = {
-            payload: {
-                event: name,
-                data: data || {}
-            }
+            event: name,
+            data: data || {}
         };
 
         return event;
@@ -70,8 +68,8 @@ var Aggregate = Base.extend({
         }
 
         _.each(events, function(event) {
-            self[event.payload.event](event.payload.data);
-            self.uncommittedEvents.push(event.payload);
+            self[event.event](event.data);
+            self.uncommittedEvents.push(event);
         });
 
         if (callback) callback(null);
