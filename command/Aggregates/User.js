@@ -5,6 +5,9 @@ var User = Aggregate.extend({
 
     registerUser: function(data, callback) {
         console.log('User.registerUser:', data);
+        if (this.attributes.revision > 0) {
+            return callback('Can\'t register User with aggregateID', this.id, 'ID already in use.')
+        }
         this.apply(this.toEvent('userRegistered', data));
 
         this.checkBusinessRules(callback);
