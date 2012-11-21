@@ -72,6 +72,8 @@ var Aggregate = Base.extend({
         });
 
         _.each(historyEvents, function(evt) {
+            // update revision
+            self.attributes.revision = evt.head.revision;
             self[evt.event](evt.payload);
         });
 
