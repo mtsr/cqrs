@@ -3,7 +3,7 @@ var amqp = require('amqp');
 var EventStore = require('eventstore');
 var EventStorage = require('eventstore.mongoDb');
 
-var CommandHandler = require('./Bases/CommandHandler');
+var Domain = require('./Domain');
 var Publisher = require('./Publisher');
 
 var connection = amqp.createConnection();
@@ -28,14 +28,14 @@ connection.on('ready', function() {
         // start EventStore
         eventStore.start();
     });
-    var commandHandler = new CommandHandler(eventStore);
+    var domain = new Domain(eventStore);
 
     connection.queue('command', function(queue) {
         queue.bind('command', 'command');
         // console.log('Queue is open:', arguments);
 
         queue.subscribe(function(message, headers, deliveryInfo) {
-            receiveMessage(exchange, commandHandler, message, headers, deliveryInfo);
+            receiveMessage(exchange, domain, message, headers, deliveryInfo);
         });
     });
 
@@ -45,10 +45,10 @@ connection.on('ready', function() {
     });
 });
 
-var receiveMessage = function(exchange, commandHandler, message, headers, deliveryInfo) {
+var receiveMessage = function(exchange, domain, message, headers, deliveryInfo) {
     console.log('Message from queue:', arguments);
 
-    commandHandler.handle(
+    domain.handle(
         message.params.aggregate,
         message.params.aggregateID,
         message.params.command,

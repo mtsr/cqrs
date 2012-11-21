@@ -1,15 +1,16 @@
+var util = require('util');
 var async = require('async');
 var _ = require('lodash');
 
-var Base = require('./Base');
+var Base = require('./Bases/Base');
 
-var CommandHandler = Base.extend({
+var Domain = Base.extend({
     constructor: function(eventStore) {
         this.eventStore = eventStore;
     },
 
     handle: function(aggregateType, aggregateID, command, data, callback) {
-        console.log('CommandHandler.handle:', aggregateType, aggregateID, command, data);
+        console.log('Domain.handle:', aggregateType, aggregateID, command, data);
         var self = this;
 
         async.waterfall([
@@ -34,11 +35,12 @@ var CommandHandler = Base.extend({
     },
 
     loadAggregate: function(aggregateType, aggregateID, callback) {
-        console.log('CommandHandler.loadAggregate:', aggregateType, aggregateID);
+        console.log('Domain.loadAggregate:', aggregateType, aggregateID);
         // TODO preload aggregates
-        var Aggregate = require('../Aggregates/'+aggregateType);
+        var Aggregate = require('./Aggregates/'+aggregateType);
         var aggregate = new Aggregate(aggregateID);
         this.eventStore.getFromSnapshot(aggregateID, function(err, snapshot, stream) {
+            console.log(util.inspect(stream, false, 5));
             async.map(stream.events, function(evt, next) {
                 next(null, evt.payload);
             }, function(err, events) {
@@ -50,7 +52,7 @@ var CommandHandler = Base.extend({
 
     commit: function(aggregate, eventStream, command, data, callback) {
         var events = aggregate.uncommittedEvents;
-        console.log('CommandHandler.commit:', events.length, 'events');
+        console.log('Domain.commit:', events.length, 'events');
 
         _.forEach(events, function(event) {
             eventStream.addEvent(event);
@@ -65,4 +67,4 @@ var CommandHandler = Base.extend({
     },
 });
 
-module.exports = CommandHandler;
+module.exports = Domain;
