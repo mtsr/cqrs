@@ -94,16 +94,14 @@ var Aggregate = Base.extend({
                     keys.push({ type: 'businessRule', ruleId: ruleId, message: message });
                 }
             });
-
-            if (index === self.businessRules.length - 1) {
-                if (keys.length > 0) {
-                    self.attributes = self.previousAttributes;
-                    callback(keys);
-                } else {
-                    callback(null);
-                }
-            }
         });
+
+        if (keys.length > 0) {
+            self.attributes = self.previousAttributes;
+            callback(keys);
+        } else {
+            callback(null);
+        }
     }
 });
 
