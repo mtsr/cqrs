@@ -5,7 +5,7 @@ var Aggregate = Base.extend({
     constructor: function(id) {
         this.id = id;
         this.uncommittedEvents = [];
-        this.attributes = { id: id, revision: 0 };
+        this.attributes = { id: id, revision: -1 };
     },
 
     set: function(data) {
@@ -30,59 +30,48 @@ var Aggregate = Base.extend({
 
     toEvent: function(name, data) {
         var event = {
-            event: name,
-            payload: data || {}
+            payload: {
+                event: name,
+                data: data || {}
+            }
         };
-
-        if (!event.payload.id) event.payload.id = this.id;
 
         return event;
     },
 
     loadFromHistory: function(data, events) {
+        var self = this;
+
         console.log('Aggregate.loadFromHistory:', data?'snapshot + ':'' + events.length, 'events');
         if (data) {
             this.set(data);
         }
 
         if (events) {
-            this.apply(_.map(events, function(evt) {
-                evt.fromHistory = true;
-                return evt;
-            }));
+            _.each(events, function(event) {
+                console.log(event);
+                // update revision
+                self.attributes.revision = event.streamRevision;
+                self[event.payload.event](event.payload.data);
+            });
+
+            this.previousAttributes = this.toJSON();
         }
     },
 
     apply: function(events, callback) {
-        // console.log('Aggregate.apply');
+        var self = this;
+
+        console.log('Aggregate.apply', events);
         var self = this;
 
         if (!_.isArray(events)) {
             events = [events];
         }
 
-        var historyEvents = [];
-        var newEvents = [];
-        _.each(events, function(evt) {
-            if (evt.fromHistory) {
-                historyEvents.push(evt);
-            } else {
-                newEvents.push(evt);
-            }
-        });
-
-        _.each(historyEvents, function(evt) {
-            // update revision
-            self.attributes.revision = evt.head.revision;
-            self[evt.event](evt.payload);
-        });
-
-        this.previousAttributes = this.toJSON();
-
-        _.each(newEvents, function(evt) {
-            self[evt.event](evt.payload);
-            evt.head = { revision: ++self.attributes.revision };
-            self.uncommittedEvents.push(evt);
+        _.each(events, function(event) {
+            self[event.payload.event](event.payload.data);
+            self.uncommittedEvents.push(event.payload);
         });
 
         if (callback) callback(null);

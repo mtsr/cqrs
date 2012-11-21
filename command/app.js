@@ -46,7 +46,7 @@ connection.on('ready', function() {
 });
 
 var receiveMessage = function(exchange, domain, message, headers, deliveryInfo) {
-    console.log('Message from queue:', arguments);
+    console.log('Message from queue:', message);
 
     domain.handle(
         message.params.aggregate,

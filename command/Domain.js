@@ -40,13 +40,8 @@ var Domain = Base.extend({
         var Aggregate = require('./Aggregates/'+aggregateType);
         var aggregate = new Aggregate(aggregateID);
         this.eventStore.getFromSnapshot(aggregateID, function(err, snapshot, stream) {
-            console.log(util.inspect(stream, false, 5));
-            async.map(stream.events, function(evt, next) {
-                next(null, evt.payload);
-            }, function(err, events) {
-                aggregate.loadFromHistory(snapshot.data, events);
-                callback(null, aggregate, stream);
-            });
+            aggregate.loadFromHistory(snapshot.data, stream.events);
+            callback(null, aggregate, stream);
         });
     },
 

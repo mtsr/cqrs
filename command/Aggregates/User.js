@@ -6,7 +6,7 @@ var User = Aggregate.extend({
     registerUser: function(data, callback) {
         console.log('User.registerUser:', data);
 
-        if (this.attributes.revision > 0) {
+        if (this.attributes.revision >= 0) {
             return callback('Can\'t register User with aggregateID', this.id, 'ID already in use.')
         }
 
@@ -16,6 +16,12 @@ var User = Aggregate.extend({
     },
 
     changeName: function(data, callback) {
+        console.log('User.changeName:', data);
+
+        if (this.attributes.revision < 0) {
+            return callback('Can\'t change name for new User. Register User first.');
+        }
+
         this.apply(this.toEvent('nameChanged', data));
 
         this.checkBusinessRules(callback);
