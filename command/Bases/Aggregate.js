@@ -6,6 +6,8 @@ var Aggregate = Base.extend({
         this.id = id;
         this.uncommittedEvents = [];
         this.attributes = { id: id, revision: -1 };
+
+        this.aggregateType = 'unknown';
     },
 
     set: function(data) {
@@ -30,6 +32,8 @@ var Aggregate = Base.extend({
 
     toEvent: function(name, data) {
         var event = {
+            aggregateType: this.aggregateType,
+            aggregateID: this.id,
             event: name,
             data: data || {}
         };

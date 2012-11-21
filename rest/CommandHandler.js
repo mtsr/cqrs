@@ -18,7 +18,7 @@ CommandHandler.prototype.init = function(ready) {
         // console.log('Exchange:', exchange);
 
         connection.queue('rest', function(queue) {
-            queue.bind('rest', 'rest');
+            queue.bind('command', 'rest');
             // console.log('Queue is open:', arguments);
 
             queue.subscribe(function(message, headers, deliveryInfo) {

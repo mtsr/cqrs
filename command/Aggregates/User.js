@@ -1,6 +1,11 @@
 var Aggregate = require('../Bases/Aggregate');
 
 var User = Aggregate.extend({
+    constructor: function() {
+        User.__super__.constructor.apply(this, arguments);
+        this.aggregateType = 'User';
+    },
+
     // Commands
 
     registerUser: function(data, callback) {
