@@ -21,7 +21,7 @@ app.configure(function() {
 });
 
 commandHandler.init(function(err) {
-    app.post('/:aggregate/:aggregateID/:command', function(req, res) {
+    app.post('/:aggregate/:aggregateID/:command/:commandID', function(req, res) {
         console.log('POST', req.url);
 
         var commandData = {
@@ -36,9 +36,9 @@ commandHandler.init(function(err) {
         commandHandler.handle(commandData, function(err, response) {
             console.log('CommandHandler Result');
             if (err) {
-                return res.send(500, { err: err, response: response });
+                return res.send(500, err);
             }
-            res.send(response);
+            res.send(200, response);
         });
     });
 

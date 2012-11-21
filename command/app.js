@@ -58,10 +58,9 @@ var receiveMessage = function(exchange, commandHandler, message, headers, delive
 }
 
 var sendResponse = function(exchange, err, response, deliveryInfo) {
-    console.log('RESPONSE', response);
-
-    var responseData = { response: response };
+    var responseData = { error: err, response: response };
     var messageData = { correlationId: deliveryInfo.correlationId };
+    console.log('RESPONSE', responseData, messageData);
     exchange.publish(deliveryInfo.replyTo, responseData, messageData, function() {
         console.log('Publish callback:', arguments);
     });
