@@ -4,7 +4,7 @@ var User = Aggregate.extend({
     // Commands
 
     registerUser: function(data, callback) {
-        console.log('User.registerUser');
+        console.log('User.registerUser:', data);
         this.apply(this.toEvent('userRegistered', data));
 
         this.checkBusinessRules(callback);
@@ -13,7 +13,7 @@ var User = Aggregate.extend({
     // Events
 
     userRegistered: function(data) {
-        console.log('User.userRegistered');
+        // console.log('User.userRegistered');
         this.set(data);
     },
 

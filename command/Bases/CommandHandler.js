@@ -9,7 +9,7 @@ var CommandHandler = Base.extend({
     },
 
     handle: function(aggregateType, aggregateID, command, data, callback) {
-        console.log('CommandHandler.handle', aggregateType, aggregateID, command, data);
+        console.log('CommandHandler.handle:', aggregateType, aggregateID, command, data);
         var self = this;
 
         async.waterfall([
@@ -24,17 +24,17 @@ var CommandHandler = Base.extend({
             function(aggregate, stream, next) {
                 self.commit(aggregate, stream, command, data, next);
             }
-        ], function(err) {
+        ], function(err, response) {
             if (err) {
                 return callback(err);
                 // throw err;
             }
-            callback(null);
+            callback(null, response);
         });
     },
 
     loadAggregate: function(aggregateType, aggregateID, callback) {
-        console.log('CommandHandler.loadAggregate');
+        console.log('CommandHandler.loadAggregate:', aggregateType, aggregateID);
         // TODO preload aggregates
         var Aggregate = require('../Aggregates/'+aggregateType);
         var aggregate = new Aggregate(aggregateID);
@@ -49,11 +49,19 @@ var CommandHandler = Base.extend({
     },
 
     commit: function(aggregate, eventStream, command, data, callback) {
-        console.log('CommandHandler.commit');
-        _.forEach(aggregate.uncommittedEvents, function(event) {
+        var events = aggregate.uncommittedEvents;
+        console.log('CommandHandler.commit:', events.length, 'events');
+
+        _.forEach(events, function(event) {
             eventStream.addEvent(event);
         });
-        eventStream.commit(callback);
+
+        eventStream.commit(function(err) {
+            if (err) {
+                return callback(err);
+            }
+            callback(err, events);
+        });
     },
 });
 

@@ -40,7 +40,7 @@ var Aggregate = Base.extend({
     },
 
     loadFromHistory: function(data, events) {
-        console.log('Aggregate.loadFromHistory');
+        console.log('Aggregate.loadFromHistory:', data?'snapshot + ':'' + events.length, 'events');
         if (data) {
             this.set(data);
         }
@@ -54,7 +54,7 @@ var Aggregate = Base.extend({
     },
 
     apply: function(events, callback) {
-        console.log('Aggregate.apply');
+        // console.log('Aggregate.apply');
         var self = this;
 
         if (!_.isArray(events)) {
@@ -72,7 +72,6 @@ var Aggregate = Base.extend({
         });
 
         _.each(historyEvents, function(evt) {
-            console.log(evt);
             self[evt.event](evt.payload);
         });
 
