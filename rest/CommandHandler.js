@@ -25,7 +25,7 @@ CommandHandler.prototype.init = function(ready) {
                 console.log('Message from queue:', message, headers, deliveryInfo);
                 var callback = self.replyQueue[deliveryInfo.correlationId];
                 if (callback) {
-                    callback(message.err, message.response);
+                    callback(message.error, message.response);
                 } else {
                     console.log('ERROR: CorrelationId', deliveryInfo.correlationId, 'not in reply queue');
                 }
