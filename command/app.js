@@ -52,7 +52,7 @@ var receiveMessage = function(exchange, commandHandler, message, headers, delive
         message.params.aggregate,
         message.params.aggregateID,
         message.params.command,
-        message.body,
+        message.data,
         function(err, response) { sendResponse(exchange, err, response, deliveryInfo); }
     );
 }
