@@ -1,10 +1,14 @@
+var _ = require('lodash');
+
 var Publisher = function(exchange) {
     this.exchange = exchange;
 }
 
 Publisher.prototype.publish = function(event) {
     console.log('Event published', event);
-    this.exchange.publish('event', event, {}, function() {
+    var headers = _.clone(event);
+    delete headers.data;
+    this.exchange.publish('event', event, { headers: headers }, function() {
         console.log('Event published');
     });
 }

@@ -35,16 +35,16 @@ connection.on('ready', function() {
     var domain = new Domain(eventStore);
 
     connection.queue('command', function(queue) {
-        queue.bind('command', 'command');
         // console.log('Queue is open:', arguments);
 
         queue.subscribe(function(message, headers, deliveryInfo) {
             receiveMessage(commandExchange, domain, message, headers, deliveryInfo);
         });
+
+        queue.bind('command', 'command');
     });
 
     process.on('SIGINT', function() {
-        commandExchange.destroy();
         connection.end();
     });
 });

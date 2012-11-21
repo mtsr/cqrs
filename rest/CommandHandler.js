@@ -18,7 +18,6 @@ CommandHandler.prototype.init = function(ready) {
         // console.log('Exchange:', exchange);
 
         connection.queue('rest', function(queue) {
-            queue.bind('command', 'rest');
             // console.log('Queue is open:', arguments);
 
             queue.subscribe(function(message, headers, deliveryInfo) {
@@ -30,10 +29,11 @@ CommandHandler.prototype.init = function(ready) {
                     console.log('ERROR: CorrelationId', deliveryInfo.correlationId, 'not in reply queue');
                 }
             });
+
+            queue.bind('command', 'rest');
         });
 
         process.on('SIGINT', function() {
-            exchange.destroy();
             connection.end();
         });
 
