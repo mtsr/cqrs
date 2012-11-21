@@ -13,10 +13,20 @@ var User = Aggregate.extend({
         this.checkBusinessRules(callback);
     },
 
+    changeName: function(data, callback) {
+        this.apply(this.toEvent('nameChanged', data));
+
+        this.checkBusinessRules(callback);
+    },
+
     // Events
 
     userRegistered: function(data) {
         // console.log('User.userRegistered');
+        this.set(data);
+    },
+
+    nameChanged: function(data) {
         this.set(data);
     },
 
