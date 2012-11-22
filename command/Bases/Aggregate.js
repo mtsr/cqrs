@@ -53,7 +53,7 @@ var Aggregate = Base.extend({
             _.each(events, function(event) {
                 console.log(event);
                 // update revision
-                self.attributes.revision = event.streamRevision;
+                self.attributes.revision = event.payload.revision;
                 self[event.payload.event](event.payload.data);
             });
 
@@ -72,6 +72,7 @@ var Aggregate = Base.extend({
         }
 
         _.each(events, function(event) {
+            event.revision = ++self.attributes.revision;
             self[event.event](event.data);
             self.uncommittedEvents.push(event);
         });
