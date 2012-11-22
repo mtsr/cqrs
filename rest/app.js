@@ -23,6 +23,9 @@ app.configure(function() {
 
 commandHandler.init(function(err) {
     app.post('/:aggregate/:aggregateID/:command', function(req, res) {
+        res.set('Access-Control-Allow-Origin', 'http://localhost:8080');
+        res.set('Access-Control-Allow-Headers', 'Content-type');
+
         console.log('POST', req.url);
 
         var commandData = {
@@ -51,7 +54,10 @@ database.open(function(err, mongodb) {
         return res.send(err);
     }
     app.get('/:collection', function(req, res) {
-        console.log(req.query);
+        console.log("Cookies:", req.cookies);
+        res.set('Access-Control-Allow-Origin', 'http://localhost:8080');
+        res.set('Access-Control-Allow-Headers', 'Content-type');
+
         var query = req.query.query?JSON.parse(req.query.query):null;
         mongodb.collection(req.params.collection, { safe: true }, function(err, collection) {
             if (err) {
@@ -89,6 +95,12 @@ database.open(function(err, mongodb) {
     });
 });
 
+app.options('*', function(req, res) {
+    res.set('Access-Control-Allow-Origin', 'http://localhost:8080');
+    res.set('Access-Control-Allow-Headers', 'Content-type');
+    res.send(200);
+});
+
     // app.put('*', function(req, res) {
     // });
 
@@ -96,5 +108,5 @@ database.open(function(err, mongodb) {
     // });
 
 http.createServer(app).listen(app.get('port'), function() {
-        console.log('Express server listening on port', app.get('port'));
+    console.log('Express server listening on port', app.get('port'));
 });
