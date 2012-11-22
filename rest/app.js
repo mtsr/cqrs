@@ -1,5 +1,6 @@
 var express = require('express');
 var http = require('http');
+var util = require('util');
 var _ = require('lodash');
 var mongodb = require('mongodb');
 
@@ -60,20 +61,29 @@ database.open(function(err, mongodb) {
             var cursor = collection.find(query);
             // console.log(typeof req.query.skip);
 
-            var skip = parseInt(req.query.skip);
-            if (skip) {
+            if ('skip' in req.query) {
+                var skip = parseInt(req.query.skip);
                 cursor = cursor.skip(skip);
             }
-            var limit = parseInt(req.query.limit);
-            if (limit) {
+            if ('limit' in req.query) {
+                var limit = parseInt(req.query.limit);
                 cursor = cursor.limit(limit);
+            }
+            if ('count' in req.query) {
+                cursor.count(function(err, count) {
+                    if (err) {
+                        res.send(500, err);
+                    }
+                    res.send(200, ""+count);
+                });
+                return;
             }
 
             cursor.toArray(function(err, items) {
                 if (err) {
                     return res.send(500, err);
                 }
-                res.send(items);
+                res.send(200, items);
             });
         });
     });
