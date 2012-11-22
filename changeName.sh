@@ -1,1 +1,0 @@
-curl -X POST -H "Content-Type: application/json" http://localhost:3000/User/7/changeName/1 -d '{ "firstName": "Jonas", "lastName": "Matser" }'
