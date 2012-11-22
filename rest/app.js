@@ -1,7 +1,7 @@
 var express = require('express');
 var http = require('http');
-
-var _ = require('underscore');
+var _ = require('lodash');
+var mongodb = require('mongodb');
 
 var commandHandler = require('./CommandHandler');
 
@@ -21,7 +21,7 @@ app.configure(function() {
 });
 
 commandHandler.init(function(err) {
-    app.post('/:aggregate/:aggregateID/:command/:commandID', function(req, res) {
+    app.post('/:aggregate/:aggregateID/:command', function(req, res) {
         console.log('POST', req.url);
 
         var commandData = {
@@ -41,17 +41,50 @@ commandHandler.init(function(err) {
             res.send(200, response);
         });
     });
+});
 
-    app.get('*', function(req, res) {
-    });
+var server = new mongodb.Server('localhost', 27017, { autoreconnect: true });
+var database = new mongodb.Db('projections', server);
+database.open(function(err, mongodb) {
+    if (err) {
+        return res.send(err);
+    }
+    app.get('/:collection', function(req, res) {
+        console.log(req.query);
+        var query = req.query.query?JSON.parse(req.query.query):null;
+        mongodb.collection(req.params.collection, { safe: true }, function(err, collection) {
+            if (err) {
+                return res.send(err);
+            }
 
-    app.put('*', function(req, res) {
-    });
+            var cursor = collection.find(query);
+            // console.log(typeof req.query.skip);
 
-    app.delete('*', function(req, res) {
-    });
+            var skip = parseInt(req.query.skip);
+            if (skip) {
+                cursor = cursor.skip(skip);
+            }
+            var limit = parseInt(req.query.limit);
+            if (limit) {
+                cursor = cursor.limit(limit);
+            }
 
-    http.createServer(app).listen(app.get('port'), function() {
-            console.log('Express server listening on port', app.get('port'));
+            cursor.toArray(function(err, items) {
+                if (err) {
+                    return res.send(500, err);
+                }
+                res.send(items);
+            });
+        });
     });
+});
+
+    // app.put('*', function(req, res) {
+    // });
+
+    // app.delete('*', function(req, res) {
+    // });
+
+http.createServer(app).listen(app.get('port'), function() {
+        console.log('Express server listening on port', app.get('port'));
 });
