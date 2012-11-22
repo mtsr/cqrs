@@ -12,15 +12,15 @@ CommandHandler.prototype.init = function(ready) {
 
     var connection = amqp.createConnection();
     connection.on('ready', function() {
-        self.exchange = connection.exchange('command', { type: 'direct' }, function(exchange) {
+        self.exchange = connection.exchange('command', { type: 'direct', confirm: true }, function(exchange) {
             // console.log('Exchange is open:', arguments);
         });
         // console.log('Exchange:', exchange);
 
-        connection.queue('rest', function(queue) {
+        connection.queue('rest', { durable: true, autoDelete: false }, function(queue) {
             // console.log('Queue is open:', arguments);
 
-            queue.subscribe(function(message, headers, deliveryInfo) {
+            queue.subscribe({ ack: true, prefetchCount: 5 }, function(message, headers, deliveryInfo) {
                 console.log('Message from queue:', message, headers, deliveryInfo);
                 var callback = self.replyQueue[deliveryInfo.correlationId];
                 if (callback) {
@@ -28,6 +28,7 @@ CommandHandler.prototype.init = function(ready) {
                 } else {
                     console.log('ERROR: CorrelationId', deliveryInfo.correlationId, 'not in reply queue');
                 }
+                queue.shift();
             });
 
             queue.bind('command', 'rest');

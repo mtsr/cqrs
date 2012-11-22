@@ -8,11 +8,11 @@ var Publisher = require('./Publisher');
 
 var connection = amqp.createConnection();
 connection.on('ready', function() {
-    var commandExchange = connection.exchange('command', { type: 'direct' }, function(exchange) {
+    var commandExchange = connection.exchange('command', { type: 'direct', confirm: true }, function(exchange) {
         console.log('Command exchange is open');
     });
 
-    var eventExchange = connection.exchange('event', { type: 'headers' }, function(exchange) {
+    var eventExchange = connection.exchange('event', { type: 'fanout', confirm: true }, function(exchange) {
         console.log('Event exchange is open');
     });
 
@@ -34,11 +34,11 @@ connection.on('ready', function() {
     });
     var domain = new Domain(eventStore);
 
-    connection.queue('command', function(queue) {
+    connection.queue('command', { durable: true, autoDelete: false }, function(queue) {
         // console.log('Queue is open:', arguments);
 
-        queue.subscribe(function(message, headers, deliveryInfo) {
-            receiveMessage(commandExchange, domain, message, headers, deliveryInfo);
+        queue.subscribe({ ack: true, prefectCount: 5 }, function(message, headers, deliveryInfo) {
+            receiveMessage(commandExchange, queue, domain, message, headers, deliveryInfo);
         });
 
         queue.bind('command', 'command');
@@ -49,7 +49,7 @@ connection.on('ready', function() {
     });
 });
 
-var receiveMessage = function(commandExchange, domain, message, headers, deliveryInfo) {
+var receiveMessage = function(commandExchange, queue, domain, message, headers, deliveryInfo) {
     console.log('Message from queue:', message);
 
     domain.handle(
@@ -57,7 +57,10 @@ var receiveMessage = function(commandExchange, domain, message, headers, deliver
         message.params.aggregateID,
         message.params.command,
         message.data,
-        function(err, response) { sendResponse(commandExchange, err, response, deliveryInfo); }
+        function(err, response) {
+            sendResponse(commandExchange, err, response, deliveryInfo);
+            queue.shift();
+        }
     );
 }
 
