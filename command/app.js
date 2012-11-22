@@ -17,7 +17,7 @@ connection.on('ready', function() {
     });
 
     var publisher = new Publisher(eventExchange);
-    var eventStore = EventStore.createStore();
+    var eventStore = EventStore.createStore({ logger: 'console' });
     EventStorage.createStorage(function(err, eventStorage) {
         if (err) {
             throw err;
@@ -26,22 +26,22 @@ connection.on('ready', function() {
         eventStore.configure(function() {
             eventStore.use(eventStorage);
             eventStore.use(publisher); // your publisher must provide function 'publisher.publish(event)'
-            eventStore.use({ logger: 'console' });
         });
 
         // start EventStore
         eventStore.start();
-    });
-    var domain = new Domain(eventStore);
 
-    connection.queue('command', { durable: true, autoDelete: false }, function(queue) {
-        // console.log('Queue is open:', arguments);
+        var domain = new Domain(eventStore);
 
-        queue.subscribe({ ack: true, prefectCount: 5 }, function(message, headers, deliveryInfo) {
-            receiveMessage(commandExchange, queue, domain, message, headers, deliveryInfo);
+        connection.queue('command', { durable: true, autoDelete: false }, function(queue) {
+            // console.log('Queue is open:', arguments);
+
+            queue.subscribe({ ack: true, prefectCount: 5 }, function(message, headers, deliveryInfo) {
+                receiveMessage(commandExchange, queue, domain, message, headers, deliveryInfo);
+            });
+
+            queue.bind('command', 'command');
         });
-
-        queue.bind('command', 'command');
     });
 
     process.on('SIGINT', function() {
