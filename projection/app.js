@@ -3,6 +3,7 @@ var path = require('path');
 var amqp = require('amqp');
 var async = require('async');
 var _ = require('lodash');
+var mongo = require('mongodb');
 
 var projections = {};
 var projectionsPath = './Projections';
@@ -11,9 +12,19 @@ var events = {};
 
 async.waterfall([
     function(callback) {
-        fs.readdir(projectionsPath, callback);
+        var server = new mongo.Server('localhost', 27017, { autoreconnect: true });
+        var database = new mongo.Db('projections', server);
+        database.open(function(err, mongodb) {
+            if (err) {
+                return callback(err);
+            }
+            callback(null, mongodb);
+        });
     },
-    function(files, callback) {
+    function(mongodb, callback) {
+        fs.readdir(projectionsPath, function(err, files) { callback(err, files, mongodb); });
+    },
+    function(files, mongodb, callback) {
         var jsFiles = _.filter(files, function(file) {
             return path.extname(file) === '.js';
         });
@@ -22,21 +33,30 @@ async.waterfall([
             var Projection = require(path.join(__dirname, projectionsPath, file));
             var projection = new Projection();
 
-            // Don't load a projection with the same name twice
-            if (projections[projection.projectionName]) {
-                return callback('Projection', projection.projectionName, 'already loaded');
-            }
-            projections[projection.projectionName] = projection;
+            // create or open mongodb collection
+            mongodb.createCollection(projection.projectionName, {}, function(err, collection) {
+                if (err) {
+                    return callback(err);
+                }
 
-            _.forEach(projection.events, function(projectionEvents, aggregateType) {
-                events[aggregateType] = events[aggregateType] || {};
-                _.forEach(projectionEvents, function(eventName) {
-                    events[aggregateType][eventName] = events[aggregateType][eventName] || [];
-                    events[aggregateType][eventName].push(projection);
+                projection.initialize(collection);
+
+                // Don't load a projection with the same name twice
+                if (projections[projection.projectionName]) {
+                    return callback('Projection', projection.projectionName, 'already loaded');
+                }
+                projections[projection.projectionName] = projection;
+
+                _.forEach(projection.events, function(projectionEvents, aggregateType) {
+                    events[aggregateType] = events[aggregateType] || {};
+                    _.forEach(projectionEvents, function(eventName) {
+                        events[aggregateType][eventName] = events[aggregateType][eventName] || [];
+                        events[aggregateType][eventName].push(projection);
+                    });
                 });
-            });
 
-            callback();
+                callback();
+            });
         }, function(err) {
             callback(err);
         });
@@ -49,8 +69,10 @@ async.waterfall([
                     console.log(message);
                     async.forEach(events[message.aggregateType][message.event], function(projection, next) {
                         projection[message.event](message);
+                        next();
                     }, function(err) {
                         if (err) {
+                            console.log(err);
                             return callback(err);
                         }
                         queue.shift();
@@ -58,7 +80,7 @@ async.waterfall([
                 });
 
                 // console.log('Queue is open:', arguments);
-                queue.bind('event', '');
+                queue.bind('event', ''); // routing key is ignored for fanout exchanges
                 // queue.bind_headers('event', { 'x-match': 'all', aggregateType: 'User' });
             });
 
@@ -71,6 +93,7 @@ async.waterfall([
     }
 ], function(err) {
     if (err) {
+        console.log(err);
         throw err;
     }
 });
