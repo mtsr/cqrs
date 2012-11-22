@@ -45,7 +45,6 @@ var User = Aggregate.extend({
 
     // Business rules
     // TODO move to separate file?
-    // TODO fix checkBusinessRules to work without business rules as well
 
     businessRules: [
         // function(changed, previous, events, callback) {
