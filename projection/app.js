@@ -67,6 +67,14 @@ async.waterfall([
             connection.queue('projection', { durable: true, autoDelete: false }, function(queue) {
                 queue.subscribe({ ack: true, prefetchCount: 5 }, function(message, headers, deliveryInfo) {
                     console.log(message);
+                    if (!message.aggregateType ||
+                        !message.event ||
+                        !events[message.aggregateType] ||
+                        !events[message.aggregateType][message.event]
+                    ) {
+                        return queue.shift();
+                    }
+
                     async.forEach(events[message.aggregateType][message.event], function(projection, next) {
                         projection[message.event](message);
                         next();
