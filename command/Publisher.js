@@ -5,7 +5,7 @@ var Publisher = function(exchange) {
 }
 
 Publisher.prototype.publish = function(event) {
-    console.log('Event published', event);
+    console.log('Publish event:', event);
     var headers = _.clone(event);
     delete headers.data;
     this.exchange.publish('event', event, {}, function() {

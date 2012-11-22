@@ -19,6 +19,7 @@ var Domain = Base.extend({
             },
             function(aggregate, stream, next) {
                 aggregate[command](data, function(err) {
+                    console.log('Aggregate callback');
                     next(err, aggregate, stream);
                 });
             },
@@ -50,13 +51,16 @@ var Domain = Base.extend({
         console.log('Domain.commit:', events.length, 'events');
 
         _.forEach(events, function(event) {
+            console.log('Event added to evenstream:', event);
             eventStream.addEvent(event);
         });
 
         eventStream.commit(function(err) {
             if (err) {
+                console.log(err);
                 return callback(err);
             }
+            console.log('Event committed');
             callback(err, events);
         });
     },
