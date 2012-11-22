@@ -18,10 +18,14 @@ var Domain = Base.extend({
                 self.loadAggregate(aggregateType, aggregateID, next);
             },
             function(aggregate, stream, next) {
-                aggregate[command](data, function(err) {
-                    console.log('Aggregate callback');
-                    next(err, aggregate, stream);
-                });
+                try {
+                    aggregate[command](data, function(err) {
+                        console.log('Aggregate callback');
+                        next(err, aggregate, stream);
+                    });
+                } catch(err) {
+                    next(err);
+                }
             },
             function(aggregate, stream, next) {
                 self.commit(aggregate, stream, command, data, next);
