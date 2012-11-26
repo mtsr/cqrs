@@ -65,25 +65,25 @@ async.waterfall([
         var connection = amqp.createConnection();
         connection.on('ready', function() {
             connection.queue('projection', { durable: true, autoDelete: false }, function(queue) {
-                queue.subscribe({ ack: true, prefetchCount: 5 }, function(message, headers, deliveryInfo) {
-                    console.log(message);
-                    if (!message.aggregateType ||
-                        !message.event ||
-                        !events[message.aggregateType] ||
-                        !events[message.aggregateType][message.event]
+                queue.subscribe({ ack: true, prefetchCount: 5 }, function(payload, headers, deliveryInfo, message) {
+                    console.log(payload);
+                    if (!payload.aggregateType ||
+                        !payload.event ||
+                        !events[payload.aggregateType] ||
+                        !events[payload.aggregateType][payload.event]
                     ) {
-                        return queue.shift();
+                        return message.acknowledge();
                     }
 
-                    async.forEach(events[message.aggregateType][message.event], function(projection, next) {
-                        projection[message.event](message);
+                    async.forEach(events[payload.aggregateType][payload.event], function(projection, next) {
+                        projection[payload.event](payload);
                         next();
                     }, function(err) {
                         if (err) {
                             console.log(err);
                             return callback(err);
                         }
-                        queue.shift();
+                        message.acknowledge();
                     });
                 });
 

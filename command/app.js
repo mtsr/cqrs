@@ -36,8 +36,8 @@ connection.on('ready', function() {
         connection.queue('command', { durable: true, autoDelete: false }, function(queue) {
             // console.log('Queue is open:', arguments);
 
-            queue.subscribe({ ack: true, prefectCount: 5 }, function(message, headers, deliveryInfo) {
-                receiveMessage(commandExchange, queue, domain, message, headers, deliveryInfo);
+            queue.subscribe({ ack: true, prefectCount: 5 }, function(payload, headers, deliveryInfo, message) {
+                receiveMessage(commandExchange, queue, domain, payload, headers, deliveryInfo, message);
             });
 
             queue.bind('command', 'command');
@@ -49,17 +49,17 @@ connection.on('ready', function() {
     });
 });
 
-var receiveMessage = function(commandExchange, queue, domain, message, headers, deliveryInfo) {
-    console.log('Message from queue:', message);
+var receiveMessage = function(commandExchange, queue, domain, payload, headers, deliveryInfo, message) {
+    console.log('Message from queue:', payload);
 
     domain.handle(
-        message.params.aggregate,
-        message.params.aggregateID,
-        message.params.command,
-        message.data,
+        payload.params.aggregate,
+        payload.params.aggregateID,
+        payload.params.command,
+        payload.data,
         function(err, response) {
             sendResponse(commandExchange, err, response, deliveryInfo);
-            queue.shift();
+            message.acknowledge();
         }
     );
 }

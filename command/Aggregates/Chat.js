@@ -31,8 +31,8 @@ var Chat = Aggregate.extend({
             return callback('Can\'t change name for new Chat. Register Chat first.');
         }
 
-        if (this.attributes.users.indexOf(data.sender) < 0) {
-            return callback('Can\'t send message to chat', this.id, 'for user', data.sender, '. User not part of chat.');
+        if (this.attributes.users.indexOf(data.authorID) < 0) {
+            return callback('Can\'t send message to chat ' + this.id + ' for user ' + data.authorID + '. User not part of chat.');
         }
 
         this.apply(this.toEvent('messageSent', data));

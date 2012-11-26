@@ -23,8 +23,6 @@ app.configure(function() {
 
 commandHandler.init(function(err) {
     app.post('/:aggregate/:aggregateID/:command', function(req, res) {
-        res.set('Access-Control-Allow-Origin', 'http://localhost:8080');
-        res.set('Access-Control-Allow-Headers', 'Content-type');
 
         console.log('POST', req.url);
 
@@ -38,10 +36,15 @@ commandHandler.init(function(err) {
         };
 
         commandHandler.handle(commandData, function(err, response) {
-            console.log('CommandHandler Result');
+            console.log('CommandHandler response');
             if (err) {
+                console.log(err);
+                res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
+                res.header('Access-Control-Allow-Headers', 'Content-type');
                 return res.send(500, err);
             }
+            res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
+            res.header('Access-Control-Allow-Headers', 'Content-type');
             res.send(200, response);
         });
     });

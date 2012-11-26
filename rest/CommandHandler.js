@@ -20,15 +20,15 @@ CommandHandler.prototype.init = function(ready) {
         connection.queue('rest', { durable: true, autoDelete: false }, function(queue) {
             // console.log('Queue is open:', arguments);
 
-            queue.subscribe({ ack: true, prefetchCount: 5 }, function(message, headers, deliveryInfo) {
-                console.log('Message from queue:', message, headers, deliveryInfo);
+            queue.subscribe({ ack: true, prefetchCount: 5 }, function(payload, headers, deliveryInfo, message) {
+                console.log('Message from queue:', payload, headers, deliveryInfo);
                 var callback = self.replyQueue[deliveryInfo.correlationId];
                 if (callback) {
-                    callback(message.error, message.response);
+                    callback(payload.error, payload.response);
                 } else {
                     console.log('ERROR: CorrelationId', deliveryInfo.correlationId, 'not in reply queue');
                 }
-                queue.shift();
+                message.acknowledge();
             });
 
             queue.bind('command', 'rest');

@@ -31,7 +31,7 @@ var Chat = Projection.extend({
         });
     },
     messageSent: function(event) {
-        console.log('Name changed', event);
+        console.log('Message sent', event);
         this.collection.update({ aggregateID: event.aggregateID }, { $push: { messages: event.data }}, { safe: true }, function(err, result) {
             if (err) {
                 console.log(err);
