@@ -6,24 +6,24 @@ var Chat = Projection.extend({
     constructor: function() {
         Chat.__super__.constructor.apply(this, arguments);
         this.projectionName = 'Chat';
-    },
 
-    initialize: function(collection) {
-        this.collection = collection;
-    },
+        this.events = {
+            Chat: [
+                'chatStarted',
+                'messageSent'
+            ]
+        };
 
-    events: {
-        Chat: [
-            'chatStarted',
-            'messageSent'
-        ]
+        this.collections = {
+            Chat: null
+        };
     },
 
     chatStarted: function(event) {
         console.log('Chat started', event);
         var doc = { aggregateID: event.aggregateID };
         _.extend(doc, event.data);
-        this.collection.insert(doc, { safe: true }, function(err, result) {
+        this.collections.Chat.insert(doc, { safe: true }, function(err, result) {
             if (err) {
                 console.log(err);
                 throw err;
@@ -32,7 +32,7 @@ var Chat = Projection.extend({
     },
     messageSent: function(event) {
         console.log('Message sent', event);
-        this.collection.update({ aggregateID: event.aggregateID }, { $push: { messages: event.data }}, { safe: true }, function(err, result) {
+        this.collections.Chat.update({ aggregateID: event.aggregateID }, { $push: { messages: event.data }}, { safe: true }, function(err, result) {
             if (err) {
                 console.log(err);
                 throw err;
