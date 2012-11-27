@@ -75,12 +75,7 @@ var Chat = Projection.extend({
             }
         });
 
-        var set = {
-        };
-        _.each(event.data, function(value, key) {
-            set["users.$."+key] = value;
-        });
-        console.log(set);
+        var set = this.makeSet(event);
 
         this.collections.Chat.update({ "users.aggregateID": event.aggregateID }, { $set: set }, function(err, result) {
             if (err) {
@@ -99,12 +94,7 @@ var Chat = Projection.extend({
             }
         });
 
-        var set = {
-        };
-        _.each(event.data, function(value, key) {
-            set["users.$."+key] = value;
-        });
-        console.log(set);
+        var set = this.makeSet(event);
 
         this.collections.Chat.update({ "users.aggregateID": event.aggregateID }, { $set: set }, function(err, result) {
             if (err) {

@@ -1,4 +1,5 @@
 var async = require('async');
+var _ = require('lodash');
 
 var Base = require('./Base');
 
@@ -28,6 +29,17 @@ var Projection = Base.extend({
 
     handle: function(event) {
         this[event.event](event);
+    },
+
+    makeSet: function(event) {
+        var set = {
+        };
+        
+        _.each(event.data, function(value, key) {
+            set["users.$."+key] = value;
+        });
+
+        return set;
     }
 });
 
