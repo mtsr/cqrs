@@ -82,7 +82,7 @@ var connectAMQP = function(callback) {
                 }
 
                 async.forEach(events[payload.aggregateType][payload.event], function(projection, next) {
-                    projection[payload.event](payload);
+                    projection.handle(payload);
                     next();
                 }, function(err) {
                     if (err) {

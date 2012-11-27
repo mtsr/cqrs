@@ -25,6 +25,10 @@ var Projection = Base.extend({
             callback(err);
         });
     },
+
+    handle: function(event) {
+        this[event.event](event);
+    }
 });
 
 module.exports = Projection;
