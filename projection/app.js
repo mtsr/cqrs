@@ -21,7 +21,7 @@ async.waterfall([
         loadProjections(files, database, callback);
     },
     function(callback) {
-        connectAMQP(callback);
+        connectAMQP(handleMessage, callback);
     }
 ], function(err) {
     if (err) {
@@ -29,6 +29,28 @@ async.waterfall([
         throw err;
     }
 });
+
+var handleMessage = function(payload, headers, deliveryInfo, message) {
+    console.log(payload);
+    if (!payload.aggregateType ||
+        !payload.event ||
+        !events[payload.aggregateType] ||
+        !events[payload.aggregateType][payload.event]
+    ) {
+        return message.acknowledge();
+    }
+
+    async.forEach(events[payload.aggregateType][payload.event], function(projection, next) {
+        projection.handle(payload);
+        next();
+    }, function(err) {
+        if (err) {
+            console.log(err);
+            return callback(err);
+        }
+        message.acknowledge();
+    });
+};
 
 var initDatabase = function(callback) {
     var server = new mongodb.Server('localhost', 27017, { autoreconnect: true });
@@ -67,30 +89,12 @@ var loadProjection = function(file, database, callback) {
     });
 };
 
-var connectAMQP = function(callback) {
+var connectAMQP = function(messageHandler, callback) {
     var connection = amqp.createConnection();
     connection.on('ready', function() {
         connection.queue('projection', { durable: true, autoDelete: false }, function(queue) {
             queue.subscribe({ ack: true, prefetchCount: 5 }, function(payload, headers, deliveryInfo, message) {
-                console.log(payload);
-                if (!payload.aggregateType ||
-                    !payload.event ||
-                    !events[payload.aggregateType] ||
-                    !events[payload.aggregateType][payload.event]
-                ) {
-                    return message.acknowledge();
-                }
-
-                async.forEach(events[payload.aggregateType][payload.event], function(projection, next) {
-                    projection.handle(payload);
-                    next();
-                }, function(err) {
-                    if (err) {
-                        console.log(err);
-                        return callback(err);
-                    }
-                    message.acknowledge();
-                });
+                messageHandler(payload, headers, deliveryInfo, message);
             });
 
             // console.log('Queue is open:', arguments);

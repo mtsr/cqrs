@@ -34,7 +34,7 @@ var Projection = Base.extend({
     makeSet: function(event) {
         var set = {
         };
-        
+
         _.each(event.data, function(value, key) {
             set["users.$."+key] = value;
         });
