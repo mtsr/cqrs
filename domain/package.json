@@ -3,14 +3,14 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node app"
+  "start": "node app"
   },
   "dependencies": {
-    "async": "*",
-    "lodash": "*",
-    "amqp": "*",
-    "cqrs-domain": "git://github.com/mtsr/node-cqrs-domain.git",
-    "eventstore.mongoDb": "*",
-    "mongodb": "*"
+  "async": "*",
+  "lodash": "*",
+  "amqp": "*",
+  "cqrs-domain": "git://github.com/mtsr/node-cqrs-domain.git",
+  "eventstore.mongoDb": "*",
+  "mongodb": "*"
   }
 }

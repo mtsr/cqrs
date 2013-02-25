@@ -1,59 +1,59 @@
 var amqp = require('amqp');
 
 var CommandHandler = function() {
-    this.requestID = 0;
-    this.replyQueue = [];
+  this.requestID = 0;
+  this.replyQueue = [];
 
-    this.exchange = null;
+  this.exchange = null;
 }
 
 CommandHandler.prototype.init = function(ready) {
-    var self = this;
+  var self = this;
 
-    var connection = amqp.createConnection();
-    connection.on('ready', function() {
-        self.exchange = connection.exchange('command', { type: 'direct', confirm: true }, function(exchange) {
-            // console.log('Exchange is open:', arguments);
-        });
-        // console.log('Exchange:', exchange);
-
-        connection.queue('rest', { durable: true, autoDelete: false }, function(queue) {
-            // console.log('Queue is open:', arguments);
-
-            queue.subscribe({ ack: true, prefetchCount: 5 }, function(payload, headers, deliveryInfo, message) {
-                console.log('Message from queue:', payload, headers, deliveryInfo);
-                var callback = self.replyQueue[deliveryInfo.correlationId];
-                if (callback) {
-                    callback(payload.error, payload.response);
-                } else {
-                    console.log('ERROR: CorrelationId', deliveryInfo.correlationId, 'not in reply queue');
-                }
-                message.acknowledge();
-            });
-
-            queue.bind('command', 'rest');
-        });
-
-        process.on('SIGINT', function() {
-            connection.end();
-        });
-
-        ready(null);
+  var connection = amqp.createConnection();
+  connection.on('ready', function() {
+    self.exchange = connection.exchange('command', { type: 'direct', confirm: true }, function(exchange) {
+      // console.log('Exchange is open:', arguments);
     });
+    // console.log('Exchange:', exchange);
+
+    connection.queue('rest', { durable: true, autoDelete: false }, function(queue) {
+      // console.log('Queue is open:', arguments);
+
+      queue.subscribe({ ack: true, prefetchCount: 5 }, function(payload, headers, deliveryInfo, message) {
+        console.log('Message from queue:', payload, headers, deliveryInfo);
+        var callback = self.replyQueue[deliveryInfo.correlationId];
+        if (callback) {
+          callback(payload.error, payload.response);
+        } else {
+          console.log('ERROR: CorrelationId', deliveryInfo.correlationId, 'not in reply queue');
+        }
+        message.acknowledge();
+      });
+
+      queue.bind('command', 'rest');
+    });
+
+    process.on('SIGINT', function() {
+      connection.end();
+    });
+
+    ready(null);
+  });
 };
 
 CommandHandler.prototype.handle = function(commandData, callback) {
-    this.replyQueue[this.requestID] = callback;
+  this.replyQueue[this.requestID] = callback;
 
-    var messageData = {
-        replyTo: 'rest',
-        correlationId: this.requestID.toString()
-    };
+  var messageData = {
+    replyTo: 'rest',
+    correlationId: this.requestID.toString()
+  };
 
-    this.exchange.publish('command', commandData, messageData, function() {
-        console.log('Publish callback:', arguments);
-    });
-    this.requestID++;
+  this.exchange.publish('command', commandData, messageData, function() {
+    console.log('Publish callback:', arguments);
+  });
+  this.requestID++;
 }
 
 module.exports = new CommandHandler();

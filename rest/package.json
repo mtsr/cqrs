@@ -3,13 +3,13 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node app"
+  "start": "node app"
   },
   "dependencies": {
-    "express": "3.0.0rc4",
-    "async": "*",
-    "lodash": "*",
-    "amqp": "*",
-    "mongodb": "*"
+  "express": "3.0.0rc4",
+  "async": "*",
+  "lodash": "*",
+  "amqp": "*",
+  "mongodb": "*"
   }
 }
