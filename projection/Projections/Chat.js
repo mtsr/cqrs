@@ -21,7 +21,7 @@ var Chat = Projection.extend({
 
     this.collections = {
       Chat: null,
-      User: null
+      'Chat.User': null
     };
   },
 

@@ -14,7 +14,7 @@ var Projection = Base.extend({
     this.database = database;
 
     async.forEach(Object.keys(this.collections), function(collectionName, next) {
-      database.createCollection(self.projectionName+'.'+collectionName, {}, function(err, collection) {
+      database.createCollection(collectionName, {}, function(err, collection) {
         if (err) {
           return next(err);
         }
