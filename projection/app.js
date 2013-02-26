@@ -31,7 +31,7 @@ async.waterfall([
 });
 
 var handleMessage = function(payload, headers, deliveryInfo, message) {
-  console.log(payload);
+  console.log('Projection.handleMessage', payload);
   if (!payload.aggregateType ||
     !payload.event ||
     !events[payload.aggregateType] ||
@@ -45,7 +45,7 @@ var handleMessage = function(payload, headers, deliveryInfo, message) {
     next();
   }, function(err) {
     if (err) {
-      console.log(err);
+      console.log('ERROR:', err);
       return callback(err);
     }
     message.acknowledge();

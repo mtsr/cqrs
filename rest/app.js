@@ -39,11 +39,11 @@ commandHandler.init(function(err) {
       console.log('CommandHandler response');
       if (err) {
         console.log(err);
-        res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
+        res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
         res.header('Access-Control-Allow-Headers', 'Content-type');
         return res.send(500, err);
       }
-      res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
+      res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
       res.header('Access-Control-Allow-Headers', 'Content-type');
       res.send(200, response);
     });
@@ -58,19 +58,17 @@ database.open(function(err, mongodb) {
   }
   app.get('/:collection', function(req, res) {
     console.log("Cookies:", req.cookies);
-    res.set('Access-Control-Allow-Origin', 'http://localhost:8080');
+    res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.set('Access-Control-Allow-Headers', 'Content-type');
 
-    var query = req.query.query?JSON.parse(req.query.query):null;
-    mongodb.collection(req.params.collection, { safe: true }, function(err, collection) {
+    mongodb.collection(req.params.collection+'.main', { safe: true }, function(err, collection) {
       if (err) {
         console.log(err);
         return res.send(err);
       }
 
-      console.log(query);
-      var cursor = collection.find(query);
-      // console.log(typeof req.query.skip);
+      console.log('Query:', req.query);
+      var cursor = collection.find(req.query);
 
       if ('skip' in req.query) {
         var skip = parseInt(req.query.skip);
@@ -101,7 +99,7 @@ database.open(function(err, mongodb) {
 });
 
 app.options('*', function(req, res) {
-  res.set('Access-Control-Allow-Origin', 'http://localhost:8080');
+  res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
   res.set('Access-Control-Allow-Headers', 'Content-type');
   res.send(200);
 });

@@ -1,1 +1,1 @@
-curl -X GET http://localhost:3000/User?aggregateID=1
+curl -X GET http://localhost:3001/User?aggregateID=1
