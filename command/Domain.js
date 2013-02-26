@@ -42,7 +42,12 @@ var Domain = Base.extend({
   loadAggregate: function(aggregateType, aggregateID, callback) {
     console.log('Domain.loadAggregate:', aggregateType, aggregateID);
     // TODO preload aggregates
-    var Aggregate = require('./Aggregates/'+aggregateType);
+    try {
+      var Aggregate = require('./Aggregates/'+aggregateType);
+    } catch (err) {
+      // aggregateType not found
+      return callback(404);
+    }
     var aggregate = new Aggregate(aggregateID);
     this.eventStore.getFromSnapshot(aggregateID, function(err, snapshot, stream) {
       aggregate.loadFromHistory(snapshot.data, stream.events);
