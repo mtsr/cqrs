@@ -1,5 +1,10 @@
 {
   "name": "cqrs",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app"
+  },
   "dependencies": {
     "express": "3.*.*",
     "jade": "",
@@ -8,6 +13,5 @@
     "async": "",
     "chokidar": "",
     "lodash": ""
-  },
-  "version": "0.0.1"
+  }
 }

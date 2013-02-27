@@ -1,0 +1,36 @@
+!!! 5
+//if lt IE 7
+  <html class="no-js lt-ie9 lt-ie8 lt-ie7">
+//if IE 7
+  <html class="no-js lt-ie9 lt-ie8">
+//if IE 8
+  <html class="no-js lt-ie9">
+// [if gt IE 8] <!
+html(class="no-js", lang="en")
+  // <![endif]
+  head
+    block title
+      title= title
+
+    block css
+      link(rel='stylesheet', href='/css/style.css')
+
+    block scripts
+      //if lt IE 9
+        <script src="dist/html5shiv.js"></script>
+      //<![endif]
+      script(data-main='js/main', src='/3p/js/require.js')
+
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+
+    //Fav and touch icons
+    link(rel='apple-touch-icon-precomposed', sizes='144x144', href='img/ico/apple-touch-icon-144x144-precomposed.png')
+    link(rel='apple-touch-icon-precomposed', sizes='114x114', href='img/ico/apple-touch-icon-114x114-precomposed.png')
+    link(rel='apple-touch-icon-precomposed', sizes='72x72', href='img/ico/apple-touch-icon-72x72-precomposed.png')
+    link(rel='apple-touch-icon-precomposed', href='img/ico/apple-touch-icon-57x57-precomposed.png')
+    link(rel='shortcut, icon', href='img/ico/favicon.ico')
+  body
+    #fb-root.fb_reset
+    block content
+      #content
+        img(src='img/spinner.gif')

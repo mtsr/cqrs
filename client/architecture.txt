@@ -1,0 +1,17 @@
+Server
+  express + jade + stylus + r.js
+    in debug mode load templates, css and javascript directly
+    in production mode use optimized versions
+  render requested page fully on the server and load backbone etc as enhancement (only on *fast* javascript-enabled clients)
+
+Client
+  main.js defines core require modules s.a. jquery, backbone, facebook
+  app.js loads core modules
+  web/layout & mobile/layout define regions for either
+  common/components defines shared components
+  web/components and mobile/components define platform-specific components
+
+layout/web.jade
+layout/mobile.jade
+components/login/web.jade
+etc

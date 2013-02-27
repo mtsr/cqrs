@@ -10,7 +10,9 @@ requirejs.config({
     'bootstrap': '3p/bootstrap/js/bootstrap',
     'text': '3p/js/text',
     'underscore': '3p/js/lodash.min',
-    'app': 'js/app'
+    'runtime': '3p/js/runtime',
+    'modernizr': '3p/js/modernizr',
+    'facebook': '//connect.facebook.net/en_US/all.js?appId=324071964354776&channelUrl=channel.html&status=1&cookie=1&xfbml=1'
   },
   shim: {
     'underscore': {
@@ -24,19 +26,28 @@ requirejs.config({
       deps: ['underscore', 'jquery', 'backbone'],
       exports: 'Backbone'
     },
-    'bootstrap': ['jquery']
+    'bootstrap': ['jquery'],
+    'runtime': {
+      exports: 'jade'
+    },
+    'facebook': {
+      exports: this.FB
+    }
   }
 });
 
 require([
+  'js/console',
+  'modernizr',
   'backbone.geppetto',
-  'app'
-], function(Geppetto, app) {
+  'js/fix',
+  'js/App',
+], function(console, modernizr, Geppetto, fix, App) {
   // expose context map as public property so that
   // we can monitor the number of contexts and events
   Geppetto.setDebug(true);
 
-  app.start({
+  App.start({
     
   });
 });
@@ -47,7 +58,7 @@ require([
 //       data: JSON.stringify({ firstName: 'Jonas', lastName: 'Matser' }),
 //       processData: false,
 //       type: 'POST',
-//       contentType: 'application/json',
+//       contentType: 'Application/json',
 //       error: function() { console.log('ERROR:', arguments); },
 //       success: function() { console.log('SUCCESS:', arguments); }
 //     });

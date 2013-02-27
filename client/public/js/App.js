@@ -6,9 +6,9 @@ define([
   'backbone.geppetto',
   'js/AppLayout'
 ], function ( $, _, Backbone, Marionette, Geppetto, AppLayout ) {
-  var app = new Marionette.Application();
+  var App = new Marionette.Application();
 
-  app.addInitializer(function(options) {
+  App.addInitializer(function(options) {
     Backbone.history.start({
       pushState: true,
       // hashchange: false,
@@ -16,16 +16,16 @@ define([
     });
   });
 
-  app.addInitializer(function(options) {
+  App.addInitializer(function(options) {
     this.addRegions({
-      mainRegion: 'body'
+      mainRegion: '#content'
     });
   });
 
-  app.addInitializer(function(options) {
+  App.addInitializer(function(options) {
     var appLayout = new AppLayout();
     this.mainRegion.show(appLayout);
   });
 
-  return app;
+  return App;
 });

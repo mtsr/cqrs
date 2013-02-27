@@ -4,9 +4,11 @@ define([
   'backbone',
   'backbone.marionette',
   'backbone.geppetto',
-  'templates/appTemplate'
+  'templates/appLayout'
 ], function ( $, _, Backbone, Marionette, Geppetto, appTemplate ) {
   var AppLayout = Marionette.Layout.extend({
     template: appTemplate
   });
+
+  return AppLayout;
 });
