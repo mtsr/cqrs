@@ -1,7 +1,13 @@
 {
   "name": "cqrs",
   "dependencies": {
-    "express": "3.0.0rc4"
+    "express": "3.*.*",
+    "jade": "",
+    "stylus": "",
+    "nib": "",
+    "async": "",
+    "chokidar": "",
+    "lodash": ""
   },
   "version": "0.0.1"
 }

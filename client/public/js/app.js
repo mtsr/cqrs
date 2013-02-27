@@ -1,10 +1,11 @@
 define([
-  "jquery",
-  "underscore",
-  "backbone",
-  "backbone.marionette",
-  "backbone.geppetto"
-], function ( $, _, Backbone, Marionette, Geppetto, WidgetContainer ) {
+  'jquery',
+  'underscore',
+  'backbone',
+  'backbone.marionette',
+  'backbone.geppetto',
+  'js/AppLayout'
+], function ( $, _, Backbone, Marionette, Geppetto, AppLayout ) {
   var app = new Marionette.Application();
 
   app.addInitializer(function(options) {
@@ -16,7 +17,14 @@ define([
   });
 
   app.addInitializer(function(options) {
-    $( "#loadingSpinner" ).hide();
+    this.addRegions({
+      mainRegion: 'body'
+    });
+  });
+
+  app.addInitializer(function(options) {
+    var appLayout = new AppLayout();
+    this.mainRegion.show(appLayout);
   });
 
   return app;
