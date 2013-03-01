@@ -6,7 +6,9 @@ define([
   'backbone.geppetto',
   'js/views/AppLayout',
   'js/views/NavbarView',
-], function ( $, _, Backbone, Marionette, Geppetto, AppLayout, NavbarView ) {
+  'js/collections/NavsCollection',
+  'js/models/NavModel',
+], function ( $, _, Backbone, Marionette, Geppetto, AppLayout, NavbarView, NavsCollection, NavModel ) {
   var App = new Marionette.Application();
 
   App.on('initialize:after', function() {
@@ -27,7 +29,13 @@ define([
     var appLayout = new AppLayout();
     this.mainRegion.show(appLayout);
 
-    var navbarView = new NavbarView();
+    var navCollection = new NavsCollection([
+      new NavModel({ navTitle: 'bla', navLink: 'bla' }),
+    ]);
+
+    var navbarView = new NavbarView({
+      collection: navCollection,
+    });
     appLayout.navbarRegion.show(navbarView);
   });
 
