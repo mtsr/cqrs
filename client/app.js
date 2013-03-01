@@ -38,7 +38,6 @@ app.configure(function() {
   app.use(express.methodOverride());
   app.use(express.cookieParser('your secret here'));
   app.use(express.session());
-  app.use(app.router);
 
   app.use(stylus.middleware({
     src: __dirname + '/public',
@@ -47,6 +46,9 @@ app.configure(function() {
 
   app.use(connect.compress());
   app.use(express.static(path.join(__dirname, 'public')));
+
+  // router after static, so router can use * and static files still work
+  app.use(app.router);
 });
 
 // In development mode use the default express errorhandler
@@ -60,7 +62,7 @@ app.locals({
 });
 
 // define routes
-app.get('/', routes.index);
+app.get('*', routes.index);
 
 // start server
 http.createServer(app).listen(app.get('port'), function(){
