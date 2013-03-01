@@ -41,9 +41,9 @@ require([
   'modernizr',
   'jquery',
   'backbone.geppetto',
-  'js/fix',
+  'js/loadTemplateFix',
   'js/App',
-], function(console, modernizr, $, Geppetto, fix, App) {
+], function(console, modernizr, $, Geppetto, loadTemplateFix, App) {
   // expose context map as public property so that
   // we can monitor the number of contexts and events
   Geppetto.setDebug(true);
