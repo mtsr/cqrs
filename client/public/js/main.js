@@ -37,13 +37,14 @@ requirejs.config({
 });
 
 require([
+  'backbone.geppetto',
+  'js/App',
   'js/console',
   'modernizr',
   'jquery',
-  'backbone.geppetto',
   'js/loadTemplateFix',
-  'js/App',
-], function(console, modernizr, $, Geppetto, loadTemplateFix, App) {
+  // 'js/pushStateClick'
+], function(Geppetto, App) {
   // expose context map as public property so that
   // we can monitor the number of contexts and events
   Geppetto.setDebug(true);
