@@ -30,7 +30,9 @@ define([
     this.mainRegion.show(appLayout);
 
     var navCollection = new NavsCollection([
-      new NavModel({ navTitle: 'bla', navLink: 'bla' }),
+      new NavModel({ navTitle: 'Home', navLink: '/' }),
+      new NavModel({ navTitle: 'About', navLink: '/about' }),
+      new NavModel({ navTitle: 'Contact', navLink: '/contact' }),
     ]);
 
     var navbarView = new NavbarView({
