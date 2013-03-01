@@ -3,6 +3,7 @@
  * Module dependencies.
  */
 
+var connect = require('connect');
 var express = require('express');
 var http = require('http');
 var path = require('path');
@@ -44,6 +45,7 @@ app.configure(function() {
     compile: compile
   }));
 
+  app.use(connect.compress());
   app.use(express.static(path.join(__dirname, 'public')));
 });
 

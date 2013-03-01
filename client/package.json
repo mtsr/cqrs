@@ -12,6 +12,7 @@
     "nib": "",
     "async": "",
     "chokidar": "",
-    "lodash": ""
+    "lodash": "",
+    "connect": ""
   }
 }

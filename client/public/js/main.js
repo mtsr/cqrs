@@ -6,10 +6,10 @@ requirejs.config({
     'backbone.babysitter': '3p/js/backbone.babysitter',
     'backbone.marionette': '3p/js/backbone.marionette',
     'backbone.geppetto': '3p/js/backbone.geppetto',
-    'jquery': '3p/js/jquery-1.9.1.min',
+    'jquery': '3p/js/jquery-1.9.1',
     'bootstrap': '3p/bootstrap/js/bootstrap',
     'text': '3p/js/text',
-    'underscore': '3p/js/lodash.min',
+    'underscore': '3p/js/lodash',
     'runtime': '3p/js/runtime',
     'modernizr': '3p/js/modernizr',
     'facebook': '//connect.facebook.net/en_US/all.js?appId=324071964354776&channelUrl=channel.html&status=1&cookie=1&xfbml=1'
@@ -39,16 +39,18 @@ requirejs.config({
 require([
   'js/console',
   'modernizr',
+  'jquery',
   'backbone.geppetto',
   'js/fix',
   'js/App',
-], function(console, modernizr, Geppetto, fix, App) {
+], function(console, modernizr, $, Geppetto, fix, App) {
   // expose context map as public property so that
   // we can monitor the number of contexts and events
   Geppetto.setDebug(true);
 
-  App.start({
-    
+  // on document ready
+  $(function() {
+    App.start();
   });
 });
 
