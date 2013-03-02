@@ -1,0 +1,9 @@
+{
+	"folders":
+	[
+		{
+			"path": "/home/jonas/development/cqrs",
+            "folder-exclude-patterns": ["build"]
+		}
+	]
+}

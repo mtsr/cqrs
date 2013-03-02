@@ -10,7 +10,7 @@ define([
   var NavbarView = Marionette.CompositeView.extend({
     template: navbarTemplate,
     itemView: NavView,
-    itemViewContainer: 'ul.nav'
+    itemViewContainer: 'ul.nav',
   });
 
   return NavbarView;
