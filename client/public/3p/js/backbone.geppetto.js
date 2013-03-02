@@ -34,16 +34,21 @@
         this.parentContext = this.options.parentContext;
         this.vent = {};
         _.extend(this.vent, Backbone.Events);
-        this.initialize && this.initialize();
+        this.initialize && this.initialize.apply(this, arguments);
         this._contextId = _.uniqueId("Context");
         contexts[this._contextId] = this;
+        this.mapCommands();
     };
 
     Geppetto.bindContext = function bindContext( options ) {
 
         this.options = options || {};
 
-        var context = new this.options.context(this.options);
+        if (typeof this.options.context === 'function') {
+          var context = new this.options.context(this.options);
+        } else if (typeof this.options.context === 'object') {
+          var context = this.options.context;
+        }
         var view = this.options.view;
 
         if (!view.close) {
@@ -59,6 +64,15 @@
         });
 
         view.context = context;
+
+        // map context events
+        _.each(view.contextEvents, function(callback, eventName) {
+          if (_.isFunction(callback)) {
+            context.listen(view, eventName, callback);
+          } else if (_.isString(callback)) {
+            context.listen(view, eventName, view[callback]);
+          }
+        });
 
         return context;
     };
@@ -116,6 +130,13 @@
             commandInstance.execute && commandInstance.execute();
 
         }, this );
+    };
+
+    Geppetto.Context.prototype.mapCommands = function mapCommands() {
+      var _this = this;
+      _.each(this.commands, function(commandClass, eventName) {
+        _this.mapCommand(eventName, commandClass);
+      });
     };
 
     Geppetto.Context.prototype.unmapAll = function unmapAll() {
