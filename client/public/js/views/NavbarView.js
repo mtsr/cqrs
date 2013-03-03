@@ -11,6 +11,21 @@ define([
     template: navbarTemplate,
     itemView: NavView,
     itemViewContainer: 'ul.nav',
+
+    // use a function for itemViewOptions to be able to get
+    // properties that aren't initialized yet
+    itemViewOptions: function() {
+      return {
+        context: this.context,
+      };
+    },
+
+    initialize: function(options) {
+      Geppetto.bindContext({
+        view: this,
+        context: options.context,
+      });
+    },
   });
 
   return NavbarView;

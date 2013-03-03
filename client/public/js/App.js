@@ -36,7 +36,6 @@ define([
       view: this,
       context: AppContext,
       navCollection: navCollection,
-      router: {},
     });
 
     var appLayout = new AppLayout({

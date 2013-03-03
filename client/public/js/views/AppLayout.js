@@ -10,6 +10,10 @@ define([
   var AppLayout = Marionette.Layout.extend({
     template: appTemplate,
 
+    events: {
+      'click a:not([data-bypass])': 'linkClicked',
+    },
+
     regions: {
       navbarRegion: '#navbar',
       sidebarRegion: '#sidebar',
@@ -18,19 +22,24 @@ define([
     },
 
     contextEvents: {
-      'navbar:show': 'showNavbar'
+      'navbar:show': 'showNavbar',
     },
 
     initialize: function(options) {
       Geppetto.bindContext({
         view: this,
         context: options.context,
-      })
+      });
+    },
+
+    linkClicked: function(event) {
+      this.context.dispatch('navigate', event);
     },
 
     showNavbar: function() {
       var navbarView = new NavbarView({
         collection: this.context.navCollection,
+        context: this.context,
       });
       this.navbarRegion.show(navbarView);
     },

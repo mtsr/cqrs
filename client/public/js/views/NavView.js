@@ -11,12 +11,14 @@ define([
     tagName: 'li',
 
     events: {
-      'click a': 'navClicked',
     },
 
-    navClicked: function(event) {
-      event.preventDefault();
-    }
+    initialize: function(options) {
+      Geppetto.bindContext({
+        view: this,
+        context: options.context,
+      });
+    },
   });
 
   return NavView;
