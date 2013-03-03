@@ -13,11 +13,19 @@ define([
     events: {
     },
 
+    modelEvents: {
+      'change:active': 'setActive',
+    },
+
     initialize: function(options) {
       Geppetto.bindContext({
         view: this,
         context: options.context,
       });
+    },
+
+    setActive: function(model, active) {
+      this.$el.toggleClass('active', active);
     },
   });
 

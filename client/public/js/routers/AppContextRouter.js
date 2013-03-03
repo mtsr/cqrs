@@ -18,11 +18,11 @@ define([
 
     // routes with callback in the router
     routes : {
-      '/' : 'home',
+      '(:fragment)': 'dispatch',
     },
 
-    home: function(){
-      this.context.dispatch('show:home');
+    dispatch: function(fragment) {
+      this.context.dispatch('route', { fragment: fragment });
     },
   });
   return AppContextRouter;

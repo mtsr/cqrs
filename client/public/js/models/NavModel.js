@@ -9,6 +9,7 @@ define([
     defaults: {
       navTitle: 'default',
       navLink: 'default',
+      active: false,
     },
   });
 
