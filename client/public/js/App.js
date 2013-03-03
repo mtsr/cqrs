@@ -32,8 +32,11 @@ define([
       new NavModel({ navTitle: 'Contact', navLink: '/contact' }),
     ]);
 
-    this.context = new AppContext({
+    Geppetto.bindContext({
+      view: this,
+      context: AppContext,
       navCollection: navCollection,
+      router: {},
     });
 
     var appLayout = new AppLayout({
