@@ -5,13 +5,14 @@ define([
   'backbone.marionette',
   'backbone.geppetto',
 ], function ( $, _, Backbone, Marionette, Geppetto ) {
-  var NavModel = Backbone.Model.extend({
+  var RouteModel = Backbone.Model.extend({
     defaults: {
-      navTitle: 'default',
-      navLink: 'default',
+      title: 'default',
+      link: 'default',
+      nav: false,
       active: false,
     },
   });
 
-  return NavModel;
+  return RouteModel;
 });

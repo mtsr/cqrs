@@ -38,7 +38,7 @@ define([
 
     showNavbar: function() {
       var navbarView = new NavbarView({
-        collection: this.context.navCollection,
+        collection: this.context.routes,
         context: this.context,
       });
       this.navbarRegion.show(navbarView);

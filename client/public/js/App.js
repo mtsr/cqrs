@@ -5,10 +5,8 @@ define([
   'backbone.marionette',
   'backbone.geppetto',
   'js/views/AppLayout',
-  'js/collections/NavsCollection',
-  'js/models/NavModel',
   'js/contexts/AppContext',
-], function ( $, _, Backbone, Marionette, Geppetto, AppLayout, NavsCollection, NavModel, AppContext ) {
+], function ( $, _, Backbone, Marionette, Geppetto, AppLayout, AppContext ) {
   var App = new Marionette.Application();
 
   App.on('initialize:after', function() {
@@ -26,16 +24,9 @@ define([
   });
 
   App.addInitializer(function(options) {
-    var navCollection = new NavsCollection([
-      new NavModel({ navTitle: 'Home', navLink: '/' }),
-      new NavModel({ navTitle: 'About', navLink: '/about' }),
-      new NavModel({ navTitle: 'Contact', navLink: '/contact' }),
-    ]);
-
     Geppetto.bindContext({
       view: this,
       context: AppContext,
-      navCollection: navCollection,
     });
 
     var appLayout = new AppLayout({
