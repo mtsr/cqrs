@@ -1,5 +1,5 @@
 div.hero-unit
-  h1 Hello, world!
-  p This is a template for a simple marketing or informational website. It includes a large callout called the hero unit and three supporting pieces of content. Use it as a starting point to create something more unique.
+  h1 Bookmarklet!
+  p Drag the button to your bookmarkbar to install the bookmarklet.
   p
-    a(href="#").btn.btn-primary.btn-large Learn more &raquo;
+    a(data-bypass=true, href="javascript:(function(){if(document.getElementById('bmlet'))return;var%20s=document.createElement('SCRIPT');s.id='bmlet';s.type='text/javascript';s.src='http://localhost:3000/js/bookmarklet.js?v='+new%20Date().getTime();document.getElementsByTagName('head')[0].appendChild(s);})();").btn.btn-primary.btn-large Bookmarklet!
