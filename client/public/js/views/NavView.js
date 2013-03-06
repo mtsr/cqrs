@@ -14,6 +14,7 @@ define([
     },
 
     modelEvents: {
+      // TODO highlighting active Nav not working because model isn't updated
       'change:active': 'setActive',
     },
 

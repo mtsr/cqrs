@@ -9,7 +9,8 @@ define([
   'js/models/NavModel',
   'js/collections/NavsCollection',
   'js/views/NavbarView',
-], function ( $, _, Backbone, Marionette, Geppetto, appTemplate, AppContext, NavModel, NavsCollection, NavbarView ) {
+  'js/views/HomeView',
+], function ( $, _, Backbone, Marionette, Geppetto, appTemplate, AppContext, NavModel, NavsCollection, NavbarView, HomeView ) {
   var AppLayout = Marionette.Layout.extend({
     template: appTemplate,
 
@@ -25,6 +26,7 @@ define([
     },
 
     contextEvents: {
+      'show:home': 'showHome',
     },
 
     initialize: function(options) {
@@ -53,6 +55,13 @@ define([
         collection: this.context.navsCollection,
       });
       this.navbarRegion.show(navbarView);
+    },
+
+    showHome: function() {
+      var homeView = new HomeView({
+        context: this.context,
+      });
+      this.contentRegion.show(homeView);
     },
   });
 
