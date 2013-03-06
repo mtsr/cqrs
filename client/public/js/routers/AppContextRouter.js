@@ -4,8 +4,9 @@ define([
   'backbone',
   'backbone.marionette',
   'backbone.geppetto',
-], function ( $, _, Backbone, Marionette, Geppetto ) {
-  AppContextRouter = Backbone.Marionette.AppRouter.extend({
+  'js/routers/ContextRouter',
+], function ( $, _, Backbone, Marionette, Geppetto, ContextRouter ) {
+  AppContextRouter = ContextRouter.extend({
     initialize: function(options) {
       // TODO use bindContext here if for whatever reason we need to listen to events to
       // runs into an circular initialization problem, though
@@ -19,6 +20,13 @@ define([
     // routes with callback in the router
     routes : {
     },
+
+    // routes that dispatch an event to this.context
+    contextRoutes: {
+      '': 'route:home',
+      'about': 'route:about',
+      'contact': 'route:contact',
+    }
   });
   return AppContextRouter;
 });
