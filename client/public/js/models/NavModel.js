@@ -5,12 +5,13 @@ define([
   'backbone.marionette',
   'backbone.geppetto',
 ], function ( $, _, Backbone, Marionette, Geppetto ) {
-  var StartCommand = function() {
-  };
+  var NavModel = Backbone.Model.extend({
+    defaults: {
+      title: 'default',
+      link: 'default',
+      active: false,
+    },
+  });
 
-  StartCommand.prototype.execute = function() {
-    this.context.dispatch('navbar:show');
-  };
-
-  return StartCommand;
+  return NavModel;
 });

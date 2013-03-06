@@ -4,23 +4,25 @@ define([
   'backbone',
   'backbone.marionette',
   'backbone.geppetto',
-  'js/models/RouteModel',
-  'js/collections/RoutesCollection',
   'js/routers/AppContextRouter',
-  'js/commands/StartCommand',
   'js/commands/NavigateCommand',
-], function ( $, _, Backbone, Marionette, Geppetto, RouteModel, RoutesCollection, AppContextRouter, StartCommand, NavigateCommand ) {
+  'js/commands/HomeCommand',
+  'js/commands/AboutCommand',
+  'js/commands/ContactCommand',
+], function ( $, _, Backbone, Marionette, Geppetto, AppContextRouter, NavigateCommand, HomeCommand, AboutCommand, ContactCommand ) {
   var AppContext = Geppetto.Context.extend({
     initialize: function(options) {
       this.router = new AppContextRouter({
         context: this,
       });
+      this.navsCollection = options.navsCollection;
     },
 
     commands: {
-      'route:home': StartCommand,
       'navigate': NavigateCommand,
-      // 'route:about route:contact': NavigateCommand,
+      'route:home': HomeCommand,
+      'route:about': AboutCommand,
+      'route:contact': ContactCommand,
     },
   });
 
