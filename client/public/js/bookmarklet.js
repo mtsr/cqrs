@@ -27,11 +27,7 @@
 
     var pageObj = {
       'URL': document.URL,
-      // content: {
-      // _content_type: "text/html; charset=UTF-8",
-      // _name: document.URL,
       'content': getDoctype(document.doctype) + "\n" + html + content + "</html>"
-      // }
     };
 
     // $.ajax({
