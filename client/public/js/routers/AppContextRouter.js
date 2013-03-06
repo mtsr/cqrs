@@ -8,7 +8,7 @@ define([
   AppContextRouter = Backbone.Marionette.AppRouter.extend({
     initialize: function(options) {
       // TODO use bindContext here if for whatever reason we need to listen to events to
-      // runs into an initialization order problem, though
+      // runs into an circular initialization problem, though
       this.context = options.context;
     },
 
@@ -18,11 +18,6 @@ define([
 
     // routes with callback in the router
     routes : {
-      '(:fragment)': 'dispatch',
-    },
-
-    dispatch: function(fragment) {
-      this.context.dispatch('route', { fragment: fragment });
     },
   });
   return AppContextRouter;

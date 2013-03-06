@@ -9,6 +9,7 @@ define([
   };
 
   StartCommand.prototype.execute = function() {
+    alert('bla');
     this.context.dispatch('navbar:show');
   };
 

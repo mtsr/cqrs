@@ -36,7 +36,7 @@ define([
   });
 
   App.on('start', function() {
-    this.context.dispatch('start');
+    // this.context.dispatch('start');
   });
 
   return App;
