@@ -42,6 +42,7 @@ define([
     },
 
     linkClicked: function(event) {
+      // TODO clicking a link sometimes triggers a reload
       this.context.dispatch('navigate', event);
     },
 
