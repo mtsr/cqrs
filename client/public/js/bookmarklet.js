@@ -30,14 +30,12 @@
       'content': getDoctype(document.doctype) + "\n" + html + content + "</html>"
     };
 
-    // $.ajax({
-      // 'type': 'POST',
-      // 'url': 'http://localhost:9200/bookmarks/bookmark/',
-      // 'data': pageObj,
-      // 'success': function(data, textStatus, jqXHR) { console.log(data); console.log(textStatus); },
-      // 'datatype': 'json'
-    // });
-
-    console.dir(pageObj);
+    $.ajax({
+      'type': 'POST',
+      'url': 'http://localhost:3001/Bookmark/'+new Date().getTime()+'/createBookmark',
+      'data': pageObj,
+      'success': function(data, textStatus, jqXHR) { console.log(data); console.log(textStatus); },
+      'datatype': 'json'
+    });
   };
 })();
