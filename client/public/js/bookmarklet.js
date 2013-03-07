@@ -3,7 +3,7 @@
     var headTag = document.getElementsByTagName("head")[0];
     var jqTag = document.createElement('script');
     jqTag.type = 'text/javascript';
-    jqTag.src = '3p/js/jquery-1.9.1.js';
+    jqTag.src = 'http://localhost:3000/3p/js/jquery-1.9.1.js';
     jqTag.onload = grabDocument;
     headTag.appendChild(jqTag);
   } else {
