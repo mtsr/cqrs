@@ -54,7 +54,7 @@ var handleMessage = function(payload, headers, deliveryInfo, message) {
 
 var initDatabase = function(callback) {
   var server = new mongodb.Server('localhost', 27017, { autoreconnect: true });
-  var database = new mongodb.Db('projections', server);
+  var database = new mongodb.Db('projections', server, { safe: true });
   database.open(function(err, database) {
     if (err) {
       return callback(err);

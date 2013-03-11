@@ -18,7 +18,7 @@ connection.on('ready', function() {
 
   var publisher = new Publisher(eventExchange);
   var eventStore = EventStore.createStore({ logger: 'console' });
-  EventStorage.createStorage(function(err, eventStorage) {
+  EventStorage.createStorage({ safe: true }, function(err, eventStorage) {
     if (err) {
       throw err;
     }
