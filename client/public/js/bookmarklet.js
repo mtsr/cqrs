@@ -27,15 +27,19 @@
 
     var pageObj = {
       'URL': document.URL,
-      'content': getDoctype(document.doctype) + "\n" + html + content + "</html>"
+      'content': getDoctype(document.doctype) + "\n" + html + content + "</html>",
+      'title': document.title,
     };
 
-    $.ajax({
+    jQuery.ajax({
       'type': 'POST',
       'url': 'http://localhost:3001/Bookmark/'+new Date().getTime()+'/createBookmark',
       'data': pageObj,
       'success': function(data, textStatus, jqXHR) { console.log(data); console.log(textStatus); },
-      'datatype': 'json'
+      'datatype': 'json',
+      'xhrFields': {
+        'withCredentials': true
+      },
     });
   };
 })();

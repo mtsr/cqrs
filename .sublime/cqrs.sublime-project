@@ -3,7 +3,7 @@
 	[
 		{
 			"path": "/home/jonas/development/cqrs",
-            "folder-exclude-patterns": ["build"]
+            "folder-exclude-patterns": ["client/build/", "client/node_modules/", "command/node_modules/", "projection/node_modules/", "rest/node_modules/"]
 		}
 	]
 }

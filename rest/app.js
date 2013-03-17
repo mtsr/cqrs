@@ -24,7 +24,7 @@ app.configure(function() {
 commandHandler.init(function(err) {
   app.post('/:aggregate/:aggregateID/:command', function(req, res) {
 
-    console.log('POST', req.url);
+    console.log('POST', req.url, req.headers);
 
     var commandData = {
       // because req.params is an [] not an {} properties are lost upon JSONify
@@ -40,11 +40,13 @@ commandHandler.init(function(err) {
       if (err) {
         console.log(err);
         res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
-        res.header('Access-Control-Allow-Headers', 'Content-type');
+        res.set('Access-Control-Allow-Headers', 'origin, content-type, accept');
+        res.set('Access-Control-Allow-Credentials', 'true');
         return res.send(500, err);
       }
       res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
-      res.header('Access-Control-Allow-Headers', 'Content-type');
+      res.set('Access-Control-Allow-Headers', 'origin, content-type, accept');
+      res.set('Access-Control-Allow-Credentials', 'true');
       res.send(200, response);
     });
   });
@@ -59,7 +61,8 @@ database.open(function(err, mongodb) {
   app.get('/:collection', function(req, res) {
     console.log("Cookies:", req.cookies);
     res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
-    res.set('Access-Control-Allow-Headers', 'Content-type');
+    res.set('Access-Control-Allow-Headers', 'origin, content-type, accept');
+    res.set('Access-Control-Allow-Credentials', 'true');
 
     mongodb.collection(req.params.collection+'.main', { safe: true }, function(err, collection) {
       if (err) {
@@ -100,7 +103,9 @@ database.open(function(err, mongodb) {
 
 app.options('*', function(req, res) {
   res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
-  res.set('Access-Control-Allow-Headers', 'Content-type');
+  res.set('Access-Control-Allow-Headers', 'origin, content-type, accept');
+  res.set('Access-Control-Allow-Credentials', 'true');
+  console.log('OPTIONS', req.url, req.headers);
   res.send(200);
 });
 
