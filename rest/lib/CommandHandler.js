@@ -1,3 +1,5 @@
+"use strict";
+
 var amqp = require('amqp');
 
 var CommandHandler = function() {
@@ -56,4 +58,4 @@ CommandHandler.prototype.handle = function(commandData, callback) {
   this.requestID++;
 }
 
-module.exports = new CommandHandler();
+module.exports = CommandHandler;
