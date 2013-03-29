@@ -19,7 +19,9 @@ App.prototype.start = function(ready) {
   async.auto({
     'commandHandler': [function(done, results) {
       var commandHandler = new CommandHandler();
-      commandHandler.init(done);
+      commandHandler.init(function(err) {
+        done(err, commandHandler);
+      });
     }],
     'database': [function(done, results) {
       var server = new mongodb.Server('localhost', 27017, { autoreconnect: true });

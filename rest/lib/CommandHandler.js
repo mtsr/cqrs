@@ -1,5 +1,6 @@
 "use strict";
 
+var async = require('async');
 var amqp = require('amqp');
 
 var CommandHandler = function() {
@@ -10,19 +11,30 @@ var CommandHandler = function() {
 }
 
 CommandHandler.prototype.init = function(ready) {
-  var self = this;
+  async.auto({
+    'connection': [function(done, results) {
+      var connection = amqp.createConnection();
 
-  var connection = amqp.createConnection();
-  connection.on('ready', function() {
-    self.exchange = connection.exchange('command', { type: 'direct', confirm: true }, function(exchange) {
-      // console.log('Exchange is open:', arguments);
-    });
-    // console.log('Exchange:', exchange);
+      process.on('SIGINT', function() {
+        connection.end();
+      });
 
-    connection.queue('rest', { durable: true, autoDelete: false }, function(queue) {
-      // console.log('Queue is open:', arguments);
-
-      queue.subscribe({ ack: true, prefetchCount: 5 }, function(payload, headers, deliveryInfo, message) {
+      connection.on('ready', function() { done(null, connection); });
+    }.bind(this)],
+    'exchange': ['connection', function(done, results) {
+      results.connection.exchange('command', { type: 'direct', confirm: true }, function(exchange) {
+        this.exchange = exchange;
+        done(null, exchange);
+      }.bind(this));
+    }.bind(this)],
+    'queue': ['connection', function(done, results) {
+      results.connection.queue('rest', { durable: true, autoDelete: false }, function(queue) {
+        queue.bind('command', 'rest');
+        done(null, queue);
+      });
+    }.bind(this)],
+    'subscription': ['queue', function(done, results) {
+      results.queue.subscribe({ ack: true, prefetchCount: 5 }, function(payload, headers, deliveryInfo, message) {
         console.log('Message from queue:', payload, headers, deliveryInfo);
         var callback = self.replyQueue[deliveryInfo.correlationId];
         if (callback) {
@@ -32,15 +44,10 @@ CommandHandler.prototype.init = function(ready) {
         }
         message.acknowledge();
       });
-
-      queue.bind('command', 'rest');
-    });
-
-    process.on('SIGINT', function() {
-      connection.end();
-    });
-
-    ready(null);
+      done();
+    }.bind(this)],
+  }, function(err, results) {
+    ready(err);
   });
 };
 
